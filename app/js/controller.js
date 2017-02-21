@@ -40,7 +40,7 @@ function editUserController(user) {
     let editView = new BrowserWindow({width: 600, height: 300, frame: true});
     editView.setMenu(null)
     editView.loadURL(url.format({
-      pathname: path.join(__dirname, 'edit.html'),
+      pathname: path.join(__dirname, 'html', 'edit.html'),
       protocol: 'file:',
       slashes: true
     }))
@@ -64,7 +64,7 @@ function tasksController(action, rows) {
   let taskView = new BrowserWindow({width: 1000, height: 800, frame: true});
   taskView.setMenu(null)
   taskView.loadURL(url.format({
-    pathname: path.join(__dirname, 'task.html'),
+    pathname: path.join(__dirname, 'html', 'task.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -97,7 +97,7 @@ function showLogsController(rows) {
       let loggerView = new BrowserWindow({width: 600, height: 300, frame: true});
       loggerView.setMenu(null)
       loggerView.loadURL(url.format({
-        pathname: path.join(__dirname, 'log.html'),
+        pathname: path.join(__dirname, 'html', 'log.html'),
         protocol: 'file:',
         slashes: true
       }))
@@ -122,7 +122,7 @@ function addUsersController() {
   let addView = new BrowserWindow({width: 600, height: 300, frame: true})
   addView.setMenu(null)
   addView.loadURL(url.format({
-    pathname: path.join(__dirname, 'add.html'),
+    pathname: path.join(__dirname, 'html', 'add.html'),
     protocol: 'file:',
     slashes: true
   }))

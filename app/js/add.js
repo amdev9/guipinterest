@@ -1,6 +1,10 @@
 ipc = require('electron').ipcRenderer;
 const fs = require("fs");
 window.$ = window.jQuery = require('jquery');
+var config = require('config');
+var softname = config.get('App.softname');
+
+document.title = "Добавить аккаунты | " + softname
 
 ipc.on('closing', () => {});
 
@@ -16,8 +20,7 @@ var openFile = function(selector) {
   var path = dialog.showOpenDialog({properties: ['openFile']}); // , 'openDirectory'
   if (path) {
     document.getElementById(selector).value = path;
-  } 
- 
+  }
 }
 
 var parseDataFileToArray = (selector) => {
@@ -37,29 +40,3 @@ var parseDataFileToArray = (selector) => {
     window.close(); 
   });
 }
-
-/////////////////////
-// jquery validate //
-/////////////////////
-
-$(function() {
-  $("#add_accounts_form").validate({
-    rules: {
-      add_acc_txt_file: "required",
-    },
-    messages: {
-      add_acc_txt_file: "Выберите файл",
-    },
-    highlight: function(element) {
-      $(element).closest('.form-group').addClass('has-danger');
-    },
-    unhighlight: function(element) {
-      $(element).closest('.form-group').removeClass('has-danger');
-    },
-    errorElement: 'span',
-    errorClass: 'form-control-feedback form-control-sm',
-    submitHandler: function(form) {
-      parseDataFileToArray('add_acc_txt_file');
-    }
-  });
-});

@@ -11,8 +11,11 @@ var readFilePromise = Promise.promisify(require("fs").readFile);
 var path = require('path');
 const os = require('os');
 var tmpdir = os.tmpdir();
-var levelpath = path.join(tmpdir, 'levdb');
+var config = require('config');
+var dbname = config.get('App.dbname');
 
+
+var levelpath = path.join(tmpdir, dbname);
 var db = new PouchDB( levelpath , {adapter: 'leveldb'});
 // PouchDB.debug.enable('*');
 PouchDB.debug.disable();

@@ -92,7 +92,6 @@ Helpers.isValidUrl = function(textval) {
     return urlregex.test(textval);
 }
 
-
 Helpers.ensureExistenceOfJSONFilePath = function(path) {
     try {
         touch.sync(path);

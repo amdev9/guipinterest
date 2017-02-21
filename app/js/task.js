@@ -2,6 +2,10 @@ ipc = require('electron').ipcRenderer;
 const fs = require("fs");
 window.$ = window.jQuery = require('jquery');
 const {dialog} = require('electron').remote
+var config = require('config');
+var softname = config.get('App.softname');
+
+document.title = "Добавление задания | " + softname 
 
 ipc.on('closing', () => {});
 
@@ -168,66 +172,4 @@ function checkDatePicker() {
   }
 }
 
-/////////////////////
-// jquery validate //
-/////////////////////
 
-$(function() {
-  $("#parse_concurrents_form").validate({
-    rules: {
-      parsed_accounts: "required",
-      concur_parsed: "required",
-      radio_follow: "required",
-      from_one: "required",
-    },
-    messages: {
-      parsed_accounts: "Выберите файл",
-      concur_parsed: "Введите имена аккаунтов для парсинга",
-      radio_follow: "",
-      from_one: "Введите кол-во"
-    },
-    highlight: function(element) {
-      $(element).closest('.form-group').addClass('has-danger');
-    },
-    unhighlight: function(element) {
-      $(element).closest('.form-group').removeClass('has-danger');
-    },
-    errorElement: 'span',
-    errorClass: 'form-control-feedback form-control-sm',  // 'help-block',
-
-    submitHandler: function(form) {
-      completeTask('parse_concurrents');
-    }
-  });
-
-
-  $("#filtration_form").validate({
-    rules: {
-      forFilterFile: "required",
-      followers_from: "required",
-      followers_to: "required",
-      publications_from: "required",
-      publications_to: "required",
-      subscribers_from: "required",
-      subscribers_to: "required",
-      filteredAccounts:  "required", 
-    },
-    messages: {
-      forFilterFile: "Выберите файл",
-      filteredAccounts: "Выберите файл"
-    },
-    highlight: function(element) {
-      $(element).closest('.form-group').addClass('has-danger');
-    },
-    unhighlight: function(element) {
-      $(element).closest('.form-group').removeClass('has-danger');
-    },
-    errorElement: 'span',
-    errorClass: 'form-control-feedback form-control-sm',
-
-    submitHandler: function(form) {
-      completeTask('filtration');
-    }
-  });
-
-});

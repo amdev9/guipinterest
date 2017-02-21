@@ -4,14 +4,13 @@
 
 'use strict';
 
-const Client = require('../instagram-private-api').V1; //     "instagram-private-api": "0.10.0",
+const Client = require('../pinterest-api'); 
 const fs = require('fs');
 var Promise = require('bluebird');
 var cookieDir = os.tmpdir() + '/cookie/';
 var async = require('async');
 
 function mediaFilter(json, task, cb) {
-  // console.log("mediaFilter");
   if (json.isBusiness) {
     mediaSessionFilter( json, task, cb);
   } else {
@@ -22,7 +21,6 @@ function mediaFilter(json, task, cb) {
 function mediaNoSessionFilter(json, task, cb) {
   var filterRequest = new Client.Web.FilterRequest();
   filterRequest.media(json.username).then(function(response) {
-    // console.log(response.items[0].created_time); 
     appendStringFile(task.outputfile, json.username);
     cb();
   });
@@ -324,31 +322,18 @@ function apiParseAccounts(user, task) {
   });
 }
 
-function apiSessionCheck(user_id, username, password) { // add proxy
-  const device = new Client.Device(username);
+function apiSessionCheck(user_id, username, password) { // add proxy // ADD ERROR DESCRIBER
   checkFolderExists(cookieDir);
-  const storage = new Client.CookieFileStorage(cookieDir + user_id + ".json");
-  Client.Session.create(device, storage, username, password)
-    .then(function(session) {
-      Client.Session.login(session, username, password).then(function(result){
-        updateUserStatusDb(user_id, 'Активен');
-      }).catch(function (err) {
-          if (err instanceof Client.Exceptions.APIError) {
-            updateUserStatusDb(user_id, err.name);
-            console.log(err);
-          } else {
-            updateUserStatusDb(user_id, 'Произошла ошибка');
-            console.log(err);
-          }
-        });
-      
-  }).catch(function (err) {
-    if (err instanceof Client.Exceptions.APIError) {
-      updateUserStatusDb(user_id, err.name);
-      console.log(err);
-    } else {
-      updateUserStatusDb(user_id, 'Произошла ошибка');
-      console.log(err);
-    }
-  });
+  Client.Session.create(cookieDir + user_id + ".json", username, password)
+    .then(function (session) {
+      updateUserStatusDb(user_id, 'Активен');
+    }).catch(function (err) {
+      if (err instanceof Client.Exceptions.APIError) {
+        updateUserStatusDb(user_id, err.name);
+        console.log(err);
+      } else {
+        updateUserStatusDb(user_id, 'Произошла ошибка');
+        console.log(err);
+      }
+    });
 }

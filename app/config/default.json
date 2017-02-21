@@ -1,8 +1,10 @@
 {
   // Customer module configs
   "App": {
-    "devTools": false,
-    "hostname": "calm-beyond-91310.herokuapp.com"
+    "softname": "PinBOT",
+    "devTools": true,
+    "hostname": "calm-beyond-91310.herokuapp.com",
+    "dbname": "pinlevdb"
   }
 }
 
