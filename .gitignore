@@ -1,0 +1,6 @@
+.DS_Store
+*.ldb
+app/dist/
+app/node_modules/
+app/cookie/
+app/logs/

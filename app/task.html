@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Добавление задания | InstaBOT </title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="./vendor/css/bootstrap.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 40px;
+  }
+</style>
+
+</head>
+<body>
+ 
+  <div class="container">
+  <h5>Задачи</h5>
+  <div class="row">
+    <div class="col-md-3">
+      <nav class="nav flex-column nav-pills">
+        <a class="nav-link" id="parse_concurrents_tab" data-toggle="tab" href="#parse_concurrents">Парсинг по конкурентам</a>
+        <a class="nav-link" id="filtration_tab" data-toggle="tab" href="#filtration">Фильтрация аудитории</a>
+      </nav>
+    </div>
+    <div class="col-md-9">
+      <div class="tab-content">
+        <div class="tab-pane" id="parse_concurrents" role="tabpanel">
+          <form id="parse_concurrents_form">
+            <div class="form-group row align-items-center offset-1 col-10">
+              <textarea class="form-control" id="parsed_conc" name="concur_parsed" rows="3"></textarea>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <div class="col-3">
+                <button  onclick="clearTextArea('parsed_conc')" class="btn btn-primary btn-sm">Очистить</button>
+              </div>
+              <div class="col-3">
+                <button  onclick="openParse('parsed_conc')" class="btn btn-primary btn-sm">Выбрать файл с аккаунтами</button>
+              </div>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <div class="custom-controls-stacked offset-1">
+                <label class="custom-control custom-radio form-control-sm">
+                  <input id="follow" name="radio_follow" type="radio" class="custom-control-input">
+                  <span class="custom-control-indicator"></span>
+                  <span class="custom-control-description">Подписчики</span>
+                </label>
+                <label class="custom-control custom-radio form-control-sm">
+                  <input id="subscribe" name="radio_follow" type="radio" class="custom-control-input">
+                  <span class="custom-control-indicator"></span>
+                  <span class="custom-control-description">Подписки</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group row align-items-center offset-1">
+              <label for="max_limit" class="col-form-label form-control-sm offset-1">Кол-во собранных с 1 аккаунта</label>
+              <div class="col-3">
+                <input class="form-control form-control-sm" type="number" value="1" min="1" name="from_one" id="max_limit">
+              </div>
+            </div>
+
+            <div class="form-group row align-items-center">
+              <div class="input-group offset-1 col-10">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" name="parsed_accounts" id="parsed_accounts">
+                <span class="input-group-btn">
+                  <button onclick="saveFile('parsed_accounts')" class="btn btn-secondary btn-sm" type="button">Выбрать</button>
+                </span>
+              </div>
+            </div>
+            <div class="form-group row align-items-center">
+              <div class="offset-3 col-9">
+                <button type="submit" class="btn btn-outline-primary btn-lg">Сохранить задачу</button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      
+        <div class="tab-pane" id="filtration" role="tabpanel">
+          <form id="filtration_form">
+          <div class="form-group row align-items-center">
+              <div class="input-group offset-1 col-10">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" name="proxy_file" id="proxy_file" disabled>
+                <span class="input-group-btn">
+                  <button onclick="openFile('proxy_file')" class="btn btn-secondary btn-sm" type="button" id="proxy_file_button" disabled>Выбрать файл с прокси</button>
+                </span>
+              </div>
+            </div>
+            <div class="form-group row align-items-center">
+              <div class="input-group offset-1 col-10">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" name="forFilterFile" id="inputfile">
+                <span class="input-group-btn">
+                  <button onclick="openFile('inputfile')" class="btn btn-secondary btn-sm" type="button">Выбрать файл для фильтрации</button>
+                </span>
+              </div>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <label for="followers_from" class="col-4 col-form-label col-form-label-sm">Подписок, от</label>
+                <div class="col-3">
+                  <input class="form-control form-control-sm" type="number" value="0" min="0" name="followers_from" id="followers_from">
+                </div>
+                <label for="followers_to" class="col-1 col-form-label col-form-label-sm">до</label>
+                <div class="col-3">
+                  <input class="form-control form-control-sm" type="number" value="0" min="0" name="followers_to" id="followers_to">
+                </div>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <label for="subscribers_from" class="col-4 col-form-label col-form-label-sm">Подписчиков, от</label>
+                <div class="col-3">
+                  <input class="form-control form-control-sm" type="number" value="0" min="0" name="subscribers_from" id="subscribers_from">
+                </div>
+                <label for="subscribers_to" class="col-1 col-form-label col-form-label-sm">до</label>
+                <div class="col-3">
+                  <input class="form-control form-control-sm" type="number" value="0" min="0" name="subscribers_to" id="subscribers_to">
+                </div>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <label for="subscribers_from" class="col-4 col-form-label col-form-label-sm">Публикаций, от</label>
+                <div class="col-3">
+                  <input class="form-control form-control-sm" type="number" value="0" min="0" name="publications_from" id="publications_from">
+                </div>
+                <label for="publications_to" class="col-1 col-form-label col-form-label-sm">до</label>
+                <div class="col-3">
+                  <input class="form-control form-control-sm" type="number" value="0" min="0" name="publications_to" id="publications_to">
+                </div>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <div class="form-check" id="div_avatar">
+                <label class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="avatar">
+                  <span class="custom-control-indicator"></span>
+                  <span class="custom-control-description form-control-sm"> У пользователя должен быть установлен аватар</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <select class="form-control form-control-sm col-5" id="private">
+                <option value="all">И открытые, и приватные</option>
+                <option value="private">Только приватные</option>
+                <option value="open">Только открытые</option>
+              </select>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <div class="form-check">
+                <label class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="date_checker" onclick="checkDatePicker();">
+                   <span class="custom-control-indicator"></span>
+                  <span class="custom-control-description form-control-sm"> Фильтрация по дате последней публикации</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group row align-items-center offset-1">
+              <label for="example-date-input" class="col-4 col-form-label col-form-label-sm">Последняя запись, не позднее</label>
+              <div class="col-5">
+                <input class="form-control form-control-sm" type="date" value="2017-01-19" id="lastdate">
+              </div>
+            </div>
+            <div class="form-group row align-items-center">
+              <div class="input-group offset-1 col-10">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" id="stop_words_file">
+                <span class="input-group-btn">
+                  <button onclick="openFile('stop_words_file')" class="btn btn-secondary btn-sm" type="button">Выбрать файл со стоп-словами</button>
+                </span>
+              </div>
+            </div>
+            <div class="form-group row align-items-center">
+              <div class="input-group offset-1 col-10">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" name="filtered_accounts" id="filtered_accounts">
+                <span class="input-group-btn">
+                  <button onclick="saveFile('filtered_accounts')" class="btn btn-secondary btn-sm" type="button">Сохранить в файл</button>
+                </span>
+              </div>
+            </div>
+            <div class="form-group row align-items-center">
+              <div class="offset-3 col-9">
+                <button type="submit" class="btn btn-outline-primary btn-lg">Сохранить задачу</button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/task.js"></script>
+<script src='./vendor/js/jquery.validate.min.js'></script>
+<script src="./vendor/js/tether.min.js"></script>
+<script src="./vendor/js/bootstrap.min.js"></script>
+  
+</body>
+</html>
+
+
