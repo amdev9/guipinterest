@@ -324,7 +324,9 @@ function apiParseAccounts(user, task) {
 
 function apiSessionCheck(user_id, username, password) { // add proxy // ADD ERROR DESCRIBER
   checkFolderExists(cookieDir);
-  Client.Session.create(cookieDir + user_id + ".json", username, password)
+  var filepath = cookieDir + user_id + ".json";
+  createFile(filepath);
+  Client.Session.create(filepath, username, password) // check for created file
     .then(function (session) {
       updateUserStatusDb(user_id, 'Активен');
     }).catch(function (err) {

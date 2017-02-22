@@ -43,7 +43,7 @@ ipc.on('edit', (event, task) => {
 
 function updateElementsAccessibility(type) {
   if (type == 'user') {
-    updateElemView(['parse_concurrents', 'filtration']);
+    updateElemView(['parse_concurrents', 'filtration', 'create_accounts']);
   } else {
     updateElemView(['filtration']);
     disableCustomElem();
@@ -163,12 +163,19 @@ function saveFile(selector) {
   }
 }
 
-document.getElementById("lastdate").disabled = true;
-function checkDatePicker() {
-  if (document.getElementById('date_checker').checked == true) {
-     document.getElementById("lastdate").disabled = false;
+document.getElementById("parsed_own_emails").disabled = true;
+document.getElementById("clean_own_emails").disabled = true;
+document.getElementById("open_own_emails").disabled = true;
+
+function checkDisabler() {
+  if (document.getElementById('own_emails').checked == true) {
+    document.getElementById("parsed_own_emails").disabled = false;
+    document.getElementById("clean_own_emails").disabled = false;
+    document.getElementById("open_own_emails").disabled = false;
   } else {
-    document.getElementById("lastdate").disabled = true;
+    document.getElementById("parsed_own_emails").disabled = true;
+    document.getElementById("clean_own_emails").disabled = true;
+    document.getElementById("open_own_emails").disabled = true;
   }
 }
 
