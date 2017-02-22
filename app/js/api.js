@@ -329,9 +329,24 @@ function apiCreateAccounts(task) {
   // status: '-',
   // type: 'task' }
 
-  
-  
-  console.log("apiCreateAccounts");
+  const NAMES = require('./config/names').names;
+  const SURNAMES = require('./config/names').surnames;
+
+  var Session = require('../pinterest-api/api/session')
+  var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
+  var email = name + 'llman@mailglobals.co';
+  var password = generatePassword();
+ 
+  console.log(name, email, password)
+  var storage = __dirname + '/js/cookie.json'
+  var session = new Session(storage);
+  Client.Register.post(session, name, email, password) 
+  .then(function(res) {
+    console.log(res);
+  })
+  .catch(function(err) {
+    console.log(err);
+  })
 
 }
 

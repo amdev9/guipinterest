@@ -22,6 +22,10 @@ function setProxyFunc(proxyString) {
   }
 }
 
+function generatePassword() {
+  return Math.random().toString(36).slice(-8).toUpperCase();
+}
+
 function checkFolderExists(filepath) {
   if (!fs.existsSync(filepath)){
     fs.mkdirSync(filepath);
