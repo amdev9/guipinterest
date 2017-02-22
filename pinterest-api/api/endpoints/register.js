@@ -12,7 +12,7 @@ Register.exists = function(email) {
     .send();
 }
 
-Register.register = function(session, first_name, email, password) {
+Register.post = function(session, first_name, email, password) {
   return new Request(session) 
     .setMethod('POST')
     .setData({

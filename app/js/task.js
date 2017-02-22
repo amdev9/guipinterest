@@ -16,34 +16,17 @@ ipc.on('type', (event, type, rows) => {
 
 ipc.on('edit', (event, task) => {
   if (task.name == 'filtration') {
-    updateElemView(['filtration']);
-    document.getElementById("inputfile").value = task.inputfile;
-    document.getElementById("followers_from").value = task.followers.from;
-    document.getElementById("followers_to").value = task.followers.to;
-    document.getElementById("publications_from").value = task.subscribers.from;
-    document.getElementById("publications_to").value = task.subscribers.to;
-    document.getElementById("subscribers_from").value = task.publications.from;
-    document.getElementById("subscribers_to").value = task.publications.to;
-    document.getElementById("stop_words_file").value = task.stop_words_file;
-    document.getElementById("avatar").checked = task.anonym_profile; 
-    document.getElementById("private").value =  task.private;
-    document.getElementById("lastdate").value = task.lastdate;
-    document.getElementById("filtered_accounts").value = task.outputfile;
-    // proxy_file ???
+    editFiltration(task);
   } else if (task.name == 'parse_concurrents') {
-    updateElemView(['parse_concurrents']);
-    document.getElementById("parsed_conc").value = task.parsed_conc.join('\n');
-    document.getElementById("follow").checked = task.parse_type;
-    document.getElementById("subscribe").checked = !task.parse_type;
-    document.getElementById("max_limit").value = task.max_limit;
-    document.getElementById("parsed_accounts").value = task.outputfile;
+    editParseConcurrents(task);
+  } else if (task.name == 'create_accounts') {
+    editCreateAccounts(task);
   }
- 
 });
 
 function updateElementsAccessibility(type) {
   if (type == 'user') {
-    updateElemView(['create_accounts']);
+    updateElemView([]);
   } else {
     updateElemView(['create_accounts']);
     // disableCustomElem();
@@ -75,73 +58,6 @@ function updateElemView(accessible) {
 function isEmpty(x) {
   if (x !== "") {
     return true;
-  }
-}
-
-function createAccounts() {
-
-  window.close();
-}
-
-function parseConcurrents() {
-  var containerRows = $("div.container").data('rows');
-  var followTrueSubscribeFalse = false;
-  var concurParsed = document.getElementById("parsed_conc").value.split('\n');
-  concurParsed = concurParsed.filter(isEmpty);
-  if (document.getElementById("follow").checked == true) {
-    followTrueSubscribeFalse = true;
-  }
-  var limit = document.getElementById("max_limit").value;
-  var parsedAccountsFile = document.getElementById("parsed_accounts").value;
-
-  const parse_concurrents_params = [parsedAccountsFile, concurParsed, limit, followTrueSubscribeFalse]; 
-  const parse_concurrents_user = [ 'task_complete_event', containerRows, taskName].concat(parse_concurrents_params);
-  ipc.send.apply(this, parse_concurrents_user);
-  window.close();
-}
-
-function filtration() {
-  var containerRows = $("div.container").data('rows');
-  var inputfile = document.getElementById("inputfile").value;
-  var followers_from = document.getElementById("followers_from").value;
-  var followers_to = document.getElementById("followers_to").value;
-  var subscribers_from = document.getElementById("subscribers_from").value;
-  var subscribers_to = document.getElementById("subscribers_to").value;
-  var publications_from = document.getElementById("publications_from").value;
-  var publications_to = document.getElementById("publications_to").value;
-  var stop_words_file = document.getElementById("stop_words_file").value;
-  var avatar = document.getElementById("avatar").checked;
-  var private = document.getElementById("private").value;
-
-  if (document.getElementById ('date_checker').checked == true) {
-    var lastdate = document.getElementById("lastdate").value;
-  } else {
-    var lastdate = "";
-  }
-  var filtered_accounts = document.getElementById("filtered_accounts").value;
-  var proxy_file = document.getElementById("proxy_file").value;
-
-  const filtration_params = [inputfile, followers_from, followers_to, subscribers_from, subscribers_to, publications_from, publications_to, stop_words_file, avatar,  private, lastdate , filtered_accounts, proxy_file];
-  const filtration_params_task = ['add_task_event', taskName].concat(filtration_params);
-  const filtration_params_user = [ 'task_complete_event', containerRows , taskName].concat(filtration_params);
-
-  if ($("div.container").attr('id') == "task" ) {
-    ipc.send.apply(this, filtration_params_task);
-    window.close();
-  } else { 
-    ipc.send.apply(this, filtration_params_user);
-    window.close();
-  }
-}
-
-function completeTask(taskName) {
-
-  if (taskName == 'parse_concurrents') {
-    parseConcurrents();
-  } else if (taskName == 'filtration') {
-    filtration();
-  } else if (taskName == 'create_accounts') {
-    createAccounts();
   }
 }
 
@@ -192,5 +108,49 @@ function checkDisabler() {
     document.getElementById("open_own_emails").disabled = true;
   }
 }
+
+function editCreateAccounts(task) {
+  $("div.container").data('task', { _id: task._id, _rev: task._rev });
+  updateElemView(['create_accounts']);
+  document.getElementById("proxy_file").value = task.proxy_file;
+  document.getElementById("output_file").value = task.output_file;
+}
+ 
+function createAccounts(taskName) {
+  var task = {};
+  var domContainer = $("div.container").data('task');
+  if (domContainer) {
+    task._id = domContainer._id;
+    task._rev = domContainer._rev;
+  } else {
+    task._id = new Date().toISOString();
+  }
+  task.status = '-';
+  task.name = taskName;
+  task.type = 'task';
+  task.email_parsed = '';
+  if(document.getElementById("own_emails").checked == true) {
+    var emailParsed = document.getElementById("parsed_own_emails").value.split('\n');
+    task.email_parsed = emailParsed.filter(isEmpty);
+  }
+  task.proxy_file = document.getElementById("proxy_file").value;
+  task.output_file = document.getElementById("output_file").value;
+
+  ipc.send('add_task_event', task);
+  window.close();
+}
+ 
+function completeTask(taskName) {
+
+  if (taskName == 'parse_concurrents') {
+    parseConcurrents(taskName);
+  } else if (taskName == 'filtration') {
+    filtration(taskName);
+  } else if (taskName == 'create_accounts') {
+    createAccounts(taskName);
+  }
+}
+
+
 
 

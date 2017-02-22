@@ -6,7 +6,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 function Request(session) {
   this._id = _.uniqueId();
-  this._jar = null;
   this._url = null;
   this._signData = false;
   this._request = {};

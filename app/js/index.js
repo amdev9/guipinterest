@@ -22,6 +22,6 @@ ipc.on('task_complete', (event, rows, taskName, params ) => {
   completeUserTaskDb(rows, taskName, params);
 });
 
-ipc.on('add_task', (event, taskName, params ) => {
-  addTaskDb(taskName, params);
+ipc.on('add_task', (event, task ) => {
+  addTaskDb(task);
 });

@@ -11,18 +11,12 @@ $(function() {
 
   $("#create_accounts_form").validate({
     rules: {
-      forFilterFile: "required",
-      followers_from: "required",
-      followers_to: "required",
-      publications_from: "required",
-      publications_to: "required",
-      subscribers_from: "required",
-      subscribers_to: "required",
-      filteredAccounts:  "required", 
+      proxy_file: "required",
+      output_file: "required",
     },
     messages: {
-      forFilterFile: "Выберите файл",
-      filteredAccounts: "Выберите файл"
+      proxy_file: "Выберите файл",
+      output_file: "Выберите файл"
     },
     highlight: function(element) {
       $(element).closest('.form-group').addClass('has-danger');
@@ -37,7 +31,6 @@ $(function() {
       completeTask('create_accounts');
     }
   });
-
 
 
 ///////////////////////////////////////////

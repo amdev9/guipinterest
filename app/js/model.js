@@ -29,78 +29,32 @@ function dropDb() {
   });
 }
 
-function addTaskDb(taskName, params) {
-  readFilePromise(params[0], 'utf8').then(function(data) {
-    var concurParsed = [];
-    concurParsed = data.split('\n');
-    concurParsed = concurParsed.filter(isEmpty);
-    return new Promise(function(resolve, reject) {
-      resolve(concurParsed);
-    });
-  }).then(function(parsed_array) {
  
-    if (taskName == 'filtration') {
-      var proxyParsed = [];
-      readFile(params[12], function (data) { 
-        proxyParsed = data.split('\n');
-        proxyParsed = proxyParsed.filter(isEmpty);
-
-        var to_parse_usernames = parsed_array.length;
-        var div = Math.floor(to_parse_usernames / (proxyParsed.length+1) );
-        var rem = to_parse_usernames % (proxyParsed.length+1);
-        // var partition = [];
-        // partition[0] = rem + div; // fix to { start: 0, end: rem + div }
-        var partition = new Array(proxyParsed.length);
-        partition.fill({});
-
-        partition[0].start = 0;
-        partition[0].end = rem + div;
-        partition[0].proxy_parc = proxyParsed[0];
-
-        for (var i = 1; i < proxyParsed.length; i++) {
-          // partition[i] = partition[i-1]+div; // fix to { start: partition[i-1].end , end: partition[i-1].end + div }
-          partition[i].start = partition[i-1].end;
-          partition[i].end = partition[i-1].end + div;
-          partition[i].proxy_parc = proxyParsed[i];
-        }
-        
-        /////////////////////////////////
-        let db_object = {
-          _id: new Date().toISOString(),
-          name: taskName,
-          inputfile: params[0],
-          input_array: parsed_array,
-          followers: {
-            from: params[1],
-            to: params[2]
-          },
-          subscribers: {
-            from: params[3], 
-            to: params[4]
-          },
-          publications: {
-            from: params[5],
-            to: params[6]
-          },
-          stop_words_file: params[7],
-          anonym_profile: params[8],
-          private: params[9],
-          lastdate: params[10],
-          outputfile: params[11],
-          partitions: partition,
-          type: 'task',
-          status: '-'
-        };
-        console.log(db_object);
-
-        db.put(db_object).then(function (response) {
-          console.log(response);
-          renderTaskRowView(response.id, taskName);
-        }).catch(function (err) {
-          console.log(err);
-        });
-      });
+function createAccountsTaskDb(task) {
+  db.put(task).then(function (response) {
+    if(!task._rev) {
+      renderTaskRowView(response.id, task.name);
     }
+  }).catch(function (err) {
+    console.log(err);
+  });
+}
+
+function addTaskDb(task) { 
+  if (task.name == 'create_accounts') {
+    createAccountsTaskDb(task);
+  }
+}
+
+function getTaskDb(row_id, webcontents) {
+  db.get(row_id).then(function(item) {
+    if (item.type == 'task') {
+      webcontents.send('edit', item);
+    } else {
+      webcontents.send('edit', item.task);
+    }
+  }).catch(function (err) {
+    console.log(err);
   });
 }
 
@@ -124,14 +78,13 @@ function addUserDb(user) {
 function runTasksDb(rows) {
   rows.forEach(function (row_id) {
     db.get(row_id).then(function(row) {
-      if (row.type == 'user' && row.task.name == 'parse_concurrents') {
-        apiParseAccounts(row, row.task);
-      } else if (row.task && row.task.name == 'filtration') {
-        apiFilterAccounts(row);
-      } else if (row.task && row.task.name == 'create_accounts') {
-        apiCreateAccounts(row);
-      } else if (row.name && row.name == 'filtration') {
-        apiFilterAccounts(row);
+      if (row.type == 'user') {
+
+      } else if (row.type == 'task') {
+        var task = row;
+        if (task.name == 'create_accounts') {
+          apiCreateAccounts(task);
+        }
       }
     }).catch(function (err) {
       console.log(err);
@@ -155,103 +108,110 @@ function getExistedUserRows(rows) {
   })
 }
 
+function parseConcurrentsUserDb(result) {
+  var users = result;
+  var to_parse_usernames = params[1].length;
+  var div = Math.floor(to_parse_usernames / users.length);
+  var rem = to_parse_usernames % users.length;
+  var dotation = [];
+  dotation[0] = rem + div;
+  for (var i = 1; i < users.length; i++) {
+    dotation[i] = dotation[i-1]+div;
+  }
+  users.forEach( function(user, i , arr) {
+
+    let db_object = {
+      _id: user._id,
+      username: user.username, 
+      proxy: user.proxy,
+      password: user.password,
+      status: user.status,
+      type: user.type,
+      cookie: user.cookie,
+      task: {
+        name: taskName,
+        outputfile: params[0], 
+        parsed_conc: (i == 0) ? params[1].slice(0, dotation[i]) : params[1].slice(dotation[i-1], dotation[i]),
+        max_limit: params[2], 
+        parse_type: params[3]
+      },
+      _rev: user._rev 
+    };
+    return db.put(db_object).then(function (result) {
+      userTaskRenderView(user._id, taskName);
+    }).catch(function (err) {
+      console.log(err);
+    });
+
+  });
+}
+
+function filtrationUserDb() {
+  var users = result;
+  var concurParsed = [];
+  readFile(params[0], function (data) {
+    concurParsed = data.split('\n');
+    concurParsed = concurParsed.filter(isEmpty);
+
+    var to_parse_usernames = concurParsed.length;
+    var div = Math.floor(to_parse_usernames / users.length);
+    var rem = to_parse_usernames % users.length;
+    var dotation = [];
+    dotation[0] = rem + div;
+    for (var i = 1; i < users.length; i++) {
+      dotation[i] = dotation[i-1]+div;
+    }
+    
+    users.forEach( function(user, i , arr) {
+      let db_object = {
+        _id: user._id,
+        username: user.username, 
+        proxy: user.proxy,
+        password: user.password,
+        status: user.status,
+        type: user.type,
+        cookie: user.cookie,
+        task: {
+          name: taskName,
+          inputfile: params[0],
+          input_array: (i == 0) ? concurParsed.slice(0, dotation[i]) : concurParsed.slice(dotation[i-1], dotation[i]), // params[0],  
+          followers: {
+            from: params[1],
+            to: params[2]
+          },
+          subscribers: {
+            from: params[3], 
+            to: params[4]
+          },
+          publications: {
+            from: params[5],
+            to: params[6]
+          },
+          stop_words_file: params[7],
+          anonym_profile: params[8],
+          private: params[9],
+          lastdate: params[10],
+          outputfile: params[11]
+        },
+        _rev: user._rev
+      };
+      return db.put(db_object).then(function (result) {
+        userTaskRenderView(user._id, taskName);
+      }).catch(function (err) {
+        console.log(err);
+      });
+    });
+  });
+}
+
 function completeUserTaskDb(rows, taskName, params) {
   getExistedUserRows(rows)
     .then(function(result) {
-    var users = result;
 
     if (taskName == 'parse_concurrents') {
-      var to_parse_usernames = params[1].length;
-      var div = Math.floor(to_parse_usernames / users.length);
-      var rem = to_parse_usernames % users.length;
-      var dotation = [];
-      dotation[0] = rem + div;
-      for (var i = 1; i < users.length; i++) {
-        dotation[i] = dotation[i-1]+div;
-      }
-      users.forEach( function(user, i , arr) {
-
-        let db_object = {
-          _id: user._id,
-          username: user.username, 
-          proxy: user.proxy,
-          password: user.password,
-          status: user.status,
-          type: user.type,
-          cookie: user.cookie,
-          task: {
-            name: taskName,
-            outputfile: params[0], 
-            parsed_conc: (i == 0) ? params[1].slice(0, dotation[i]) : params[1].slice(dotation[i-1], dotation[i]),
-            max_limit: params[2], 
-            parse_type: params[3]
-          },
-          _rev: user._rev 
-        };
-        return db.put(db_object).then(function (result) {
-          userTaskRenderView(user._id, taskName);
-        }).catch(function (err) {
-          console.log(err);
-        });
-
-      });
-    
+      parseConcurrentsUserDb(result);
     } else if (taskName == 'filtration') {
-
-      var concurParsed = [];
-      readFile(params[0], function (data) {
-        concurParsed = data.split('\n');
-        concurParsed = concurParsed.filter(isEmpty);
-
-        var to_parse_usernames = concurParsed.length;
-        var div = Math.floor(to_parse_usernames / users.length);
-        var rem = to_parse_usernames % users.length;
-        var dotation = [];
-        dotation[0] = rem + div;
-        for (var i = 1; i < users.length; i++) {
-          dotation[i] = dotation[i-1]+div;
-        }
-        
-        users.forEach( function(user, i , arr) {
-          let db_object = {
-            _id: user._id,
-            username: user.username, 
-            proxy: user.proxy,
-            password: user.password,
-            status: user.status,
-            type: user.type,
-            cookie: user.cookie,
-            task: {
-              name: taskName,
-              inputfile: params[0],
-              input_array: (i == 0) ? concurParsed.slice(0, dotation[i]) : concurParsed.slice(dotation[i-1], dotation[i]), // params[0],  
-              followers: {
-                from: params[1],
-                to: params[2]
-              },
-              subscribers: {
-                from: params[3], 
-                to: params[4]
-              },
-              publications: {
-                from: params[5],
-                to: params[6]
-              },
-              stop_words_file: params[7],
-              anonym_profile: params[8],
-              private: params[9],
-              lastdate: params[10],
-              outputfile: params[11]
-            },
-            _rev: user._rev
-          };
-          return db.put(db_object).then(function (result) {
-            userTaskRenderView(user._id, taskName);
-          }).catch(function (err) {
-            console.log(err);
-          });
-        });
-      });
+      filtrationUserDb(result);
     }
 
   }).catch(function(err) {
@@ -296,19 +256,6 @@ function getUserDb(user_id, webcontents) {
   });
 }
 
-function getTaskDb(row_id, webcontents) {
-  // figure out by row_id user or task
-  // console.log(row_id);
-  db.get(row_id).then(function(item) {
-    if (item.type == 'task') {
-      webcontents.send('edit', item);
-    } else {
-      webcontents.send('edit', item.task);
-    }
-  }).catch(function (err) {
-    console.log(err);
-  });
-}
 
 function updateUserStatusDb(user_id, statusValue) {
   db.get(user_id).then(function(user) {

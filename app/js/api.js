@@ -96,30 +96,26 @@ var filterNoSession = function(task) {
   fs.truncate(task.outputfile, 0, function() { 
     loggerDb(task._id, 'Файл подготовлен');
   });
- 
-  // for (var i = 0; i < task.partitions.length; i++) {
-  
+
   async.forEach(task.partitions, function (taskpart, callback) {
-    // if(task.proxy_parc.length > 0) {
-      console.log(taskpart.proxy_parc);
+ 
     setProxyFunc(taskpart.proxy_parc);
-    // }
-    var filterRequest = new Client.Web.FilterRequest();   
-    // var iterator = (i == 0) ? 0 : task.partitions[i-1]; 
+    
+    var filterRequest = new Client.Web.FilterRequest();
     var iterator = taskpart.start;
     var promiseWhile = function( action) {
       var resolver = Promise.defer();
       var func = function(json) {
         if (json) {
           filterFunction(json, task, function() {
-            renderTaskCompletedView(task._id); // +1 //, iterator, task.input_array.length
+            renderTaskCompletedView(task._id); 
           });
         }
 
         if (getStateView(task._id) == 'stop' || iterator >= taskpart.end ) { 
           deleteStopStateView(task._id);
           return resolver.resolve(); 
-        } // max_limit value -> partition[i]
+        }  
         return Promise.cast(action())
           .then(func)
           .catch(resolver.reject);
@@ -141,7 +137,7 @@ var filterNoSession = function(task) {
     }).catch(function (err) {
       console.log(err);
     });
-  // }
+ 
       callback();
    }, function(err) {
     console.log(err);
@@ -322,8 +318,21 @@ function apiParseAccounts(user, task) {
   });
 }
 
-function apiCreateAccounts() {
+function apiCreateAccounts(task) {
+
+  // { _id: '2017-02-22T18:32:55.086Z',
+  // _rev: '7-d41bdb8c07723d9fd0f59a0316725f30',
+  // email_parsed: '',
+  // name: 'create_accounts',
+  // output_file: 'atesk',
+  // proxy_file: 'test1',
+  // status: '-',
+  // type: 'task' }
+
+  
+  
   console.log("apiCreateAccounts");
+
 }
 
 function apiSessionCheck(user_id, username, password) { // add proxy // ADD ERROR DESCRIBER

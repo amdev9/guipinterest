@@ -3,6 +3,8 @@ var FileCookieStore = require('tough-cookie-filestore');
 var Resource = require('./resource');
 var Request = require('./request');
 var request = require('request-promise');
+ 
+
 
 function Session(storage) {
   this.setCookiesStorage(storage);
