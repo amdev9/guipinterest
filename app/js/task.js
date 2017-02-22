@@ -43,10 +43,10 @@ ipc.on('edit', (event, task) => {
 
 function updateElementsAccessibility(type) {
   if (type == 'user') {
-    updateElemView(['parse_concurrents', 'filtration', 'create_accounts']);
+    updateElemView(['create_accounts']);
   } else {
-    updateElemView(['filtration']);
-    disableCustomElem();
+    updateElemView(['create_accounts']);
+    // disableCustomElem();
   }
 }
 
@@ -78,55 +78,70 @@ function isEmpty(x) {
   }
 }
 
-function completeTask(taskName) {
+function createAccounts() {
+
+  window.close();
+}
+
+function parseConcurrents() {
   var containerRows = $("div.container").data('rows');
-  if (taskName == 'parse_concurrents') {
-    var followTrueSubscribeFalse = false;
-    var concurParsed = document.getElementById("parsed_conc").value.split('\n');
-    concurParsed = concurParsed.filter(isEmpty);
-    if (document.getElementById("follow").checked == true) {
-      followTrueSubscribeFalse = true;
-    }
-    var limit = document.getElementById("max_limit").value;
-    var parsedAccountsFile = document.getElementById("parsed_accounts").value;
+  var followTrueSubscribeFalse = false;
+  var concurParsed = document.getElementById("parsed_conc").value.split('\n');
+  concurParsed = concurParsed.filter(isEmpty);
+  if (document.getElementById("follow").checked == true) {
+    followTrueSubscribeFalse = true;
+  }
+  var limit = document.getElementById("max_limit").value;
+  var parsedAccountsFile = document.getElementById("parsed_accounts").value;
 
-    const parse_concurrents_params = [parsedAccountsFile, concurParsed, limit, followTrueSubscribeFalse]; 
-    const parse_concurrents_user = [ 'task_complete_event', containerRows, taskName].concat(parse_concurrents_params);
-    ipc.send.apply(this, parse_concurrents_user);
+  const parse_concurrents_params = [parsedAccountsFile, concurParsed, limit, followTrueSubscribeFalse]; 
+  const parse_concurrents_user = [ 'task_complete_event', containerRows, taskName].concat(parse_concurrents_params);
+  ipc.send.apply(this, parse_concurrents_user);
+  window.close();
+}
+
+function filtration() {
+  var containerRows = $("div.container").data('rows');
+  var inputfile = document.getElementById("inputfile").value;
+  var followers_from = document.getElementById("followers_from").value;
+  var followers_to = document.getElementById("followers_to").value;
+  var subscribers_from = document.getElementById("subscribers_from").value;
+  var subscribers_to = document.getElementById("subscribers_to").value;
+  var publications_from = document.getElementById("publications_from").value;
+  var publications_to = document.getElementById("publications_to").value;
+  var stop_words_file = document.getElementById("stop_words_file").value;
+  var avatar = document.getElementById("avatar").checked;
+  var private = document.getElementById("private").value;
+
+  if (document.getElementById ('date_checker').checked == true) {
+    var lastdate = document.getElementById("lastdate").value;
+  } else {
+    var lastdate = "";
+  }
+  var filtered_accounts = document.getElementById("filtered_accounts").value;
+  var proxy_file = document.getElementById("proxy_file").value;
+
+  const filtration_params = [inputfile, followers_from, followers_to, subscribers_from, subscribers_to, publications_from, publications_to, stop_words_file, avatar,  private, lastdate , filtered_accounts, proxy_file];
+  const filtration_params_task = ['add_task_event', taskName].concat(filtration_params);
+  const filtration_params_user = [ 'task_complete_event', containerRows , taskName].concat(filtration_params);
+
+  if ($("div.container").attr('id') == "task" ) {
+    ipc.send.apply(this, filtration_params_task);
     window.close();
+  } else { 
+    ipc.send.apply(this, filtration_params_user);
+    window.close();
+  }
+}
 
+function completeTask(taskName) {
+
+  if (taskName == 'parse_concurrents') {
+    parseConcurrents();
   } else if (taskName == 'filtration') {
-
-    var inputfile = document.getElementById("inputfile").value;
-    var followers_from = document.getElementById("followers_from").value;
-    var followers_to = document.getElementById("followers_to").value;
-    var subscribers_from = document.getElementById("subscribers_from").value;
-    var subscribers_to = document.getElementById("subscribers_to").value;
-    var publications_from = document.getElementById("publications_from").value;
-    var publications_to = document.getElementById("publications_to").value;
-    var stop_words_file = document.getElementById("stop_words_file").value;
-    var avatar = document.getElementById("avatar").checked;
-    var private = document.getElementById("private").value;
-
-    if (document.getElementById ('date_checker').checked == true) {
-      var lastdate = document.getElementById("lastdate").value;
-    } else {
-      var lastdate = "";
-    }
-    var filtered_accounts = document.getElementById("filtered_accounts").value;
-    var proxy_file = document.getElementById("proxy_file").value;
-
-    const filtration_params = [inputfile, followers_from, followers_to, subscribers_from, subscribers_to, publications_from, publications_to, stop_words_file, avatar,  private, lastdate , filtered_accounts, proxy_file];
-    const filtration_params_task = ['add_task_event', taskName].concat(filtration_params);
-    const filtration_params_user = [ 'task_complete_event', containerRows , taskName].concat(filtration_params);
-
-    if ($("div.container").attr('id') == "task" ) {
-      ipc.send.apply(this, filtration_params_task);
-      window.close();
-    } else { 
-      ipc.send.apply(this, filtration_params_user);
-      window.close();
-    }
+    filtration();
+  } else if (taskName == 'create_accounts') {
+    createAccounts();
   }
 }
 
@@ -156,7 +171,6 @@ function readFile(filepath, cb) {
 }
 
 function saveFile(selector) {
- 
   var path = dialog.showSaveDialog();
   if (path) {
     document.getElementById(selector).value = path;

@@ -128,6 +128,8 @@ function runTasksDb(rows) {
         apiParseAccounts(row, row.task);
       } else if (row.task && row.task.name == 'filtration') {
         apiFilterAccounts(row);
+      } else if (row.task && row.task.name == 'create_accounts') {
+        apiCreateAccounts(row);
       } else if (row.name && row.name == 'filtration') {
         apiFilterAccounts(row);
       }

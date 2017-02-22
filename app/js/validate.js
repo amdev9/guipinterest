@@ -4,6 +4,47 @@
 
 $(function() {
 
+
+///////////////////////////////////////////
+////////////// PIN ////////////////////////
+///////////////////////////////////////////
+
+  $("#create_accounts_form").validate({
+    rules: {
+      forFilterFile: "required",
+      followers_from: "required",
+      followers_to: "required",
+      publications_from: "required",
+      publications_to: "required",
+      subscribers_from: "required",
+      subscribers_to: "required",
+      filteredAccounts:  "required", 
+    },
+    messages: {
+      forFilterFile: "Выберите файл",
+      filteredAccounts: "Выберите файл"
+    },
+    highlight: function(element) {
+      $(element).closest('.form-group').addClass('has-danger');
+    },
+    unhighlight: function(element) {
+      $(element).closest('.form-group').removeClass('has-danger');
+    },
+    errorElement: 'span',
+    errorClass: 'form-control-feedback form-control-sm',
+
+    submitHandler: function(form) {
+      completeTask('create_accounts');
+    }
+  });
+
+
+
+///////////////////////////////////////////
+////////////// INSTA //////////////////////
+///////////////////////////////////////////
+
+
   $("#add_accounts_form").validate({
     rules: {
       add_acc_txt_file: "required",

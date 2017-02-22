@@ -322,6 +322,10 @@ function apiParseAccounts(user, task) {
   });
 }
 
+function apiCreateAccounts() {
+  console.log("apiCreateAccounts");
+}
+
 function apiSessionCheck(user_id, username, password) { // add proxy // ADD ERROR DESCRIBER
   checkFolderExists(cookieDir);
   var filepath = cookieDir + user_id + ".json";
