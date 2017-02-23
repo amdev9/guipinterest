@@ -29,9 +29,14 @@ Register.post = function(session, first_name, email, password) {
       throw error;
     })
     .then(function(res) {
-      var access_token = res.body.data;
-      session.setAuthorization(access_token);
-      return session;
+      if (res.body.status == "success" && res.body.message == "ok") {
+        var access_token = res.body.data;
+        session.setAuthorization(access_token);
+        return session;
+      } else {
+        console.log(res.body);
+      }
+      // return res.body;
     })
     .catch(function(error) {
       console.log(error);

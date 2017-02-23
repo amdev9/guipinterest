@@ -35,7 +35,7 @@ function checkFolderExists(filepath) {
 function appendStringFile(filepath, string) {
   fs.appendFile(filepath, string + '\n', (err) => {
     if (err) throw err;
-    // console.log('appended to file');
+    console.log('appended to file');
   });
 }
 

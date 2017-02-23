@@ -329,6 +329,54 @@ function apiCreateAccounts(task) {
   // status: '-',
   // type: 'task' }
 
+  // Gatekeeper.experiments()
+  // Gatekeeper.activate('smartlock')
+  // Gatekeeper.activate('ads_log_plain_mobile_advertiser_id')
+  // Client.Register.post(session, name, email, password) 
+  // Users.me(session)
+  // Users.state(session, 'LANDING_PAGE_PINS_INJECTED')
+  // Gatekeeper.activate('ads_log_plain_mobile_advertiser_id')
+  // Gatekeeper.experiments()
+  // Gatekeeper.activate('android_cgb')
+  // Users.me(session)
+  // Users.meBoards(session)
+  // Experiences.get(session)
+  // Conversations.get(session)
+  // Gatekeeper.activate('android_hashtag_feed_v2')
+  // Gatekeeper.activate('android_aggregated_pins')
+  // Gatekeeper.activate('homefeed_tuner_android')
+  // Notifications.get(session)
+  // Feeds.home(session)
+  // Users.meInterests(session)
+  // Feeds.home(session)
+  // Users.contactsSuggestions(session)
+  // var data1 = {
+  //   'requests': '[' + JSON.stringify({
+  //   'method':'PUT',
+  //   'uri':'/v3/experiences/20006:30012/viewed/'}) + ']'
+  // };
+  // var data2 = {
+  //   'requests': '[{"method":"GET","uri":"/v3/users/config/invitability/feature_weights/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/name_heuristics/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/settings/","params":{"snapshot_key":"0"}}]'
+  // };
+  // var data3 = {
+  //   'requests': "[" + JSON.stringify({
+  //                      "method": "PUT",
+  //                      "uri"   : "/v3/experiences/20006:30012/completed/"}) + "]" 
+  // };
+  // var data4 = {
+  //   'requests': '[{"method":"GET","uri":"/v3/experiences/","params":{"placement_ids":"20002"}}]' 
+  // };
+
+  // Batch.post(session, data2)
+  // Orientation.signal(session)
+  // Users.interestsFavorited (session, myid) /// from users.me response
+  // Batch.post(session, data3)
+  // Experiences.get(session)
+  // Orientation.status(session)
+  // Batch.post(session, data4)
+  // Notifications.get(session)
+ 
+
   const NAMES = require('./config/names').names;
   const SURNAMES = require('./config/names').surnames;
 
@@ -341,8 +389,13 @@ function apiCreateAccounts(task) {
   var storage = __dirname + '/js/cookie.json'
   var session = new Session(storage);
   Client.Register.post(session, name, email, password) 
-  .then(function(res) {
-    console.log(res);
+  .then(function(session) {
+    if (session instanceof Session) {
+      console.log(session);
+      // appendStringFile(task.output_file, email + "|" + name + "|" + password);
+    }
+    
+    
   })
   .catch(function(err) {
     console.log(err);
