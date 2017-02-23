@@ -318,88 +318,176 @@ function apiParseAccounts(user, task) {
   });
 }
 
-function apiCreateAccounts(task) {
 
-  // { _id: '2017-02-22T18:32:55.086Z',
-  // _rev: '7-d41bdb8c07723d9fd0f59a0316725f30',
-  // email_parsed: '',
-  // name: 'create_accounts',
-  // output_file: 'atesk',
-  // proxy_file: 'test1',
-  // status: '-',
-  // type: 'task' }
+function fullCreateAccount(session, cb) {
 
-  // Gatekeeper.experiments()
-  // Gatekeeper.activate('smartlock')
-  // Gatekeeper.activate('ads_log_plain_mobile_advertiser_id')
-  // Client.Register.post(session, name, email, password) 
-  // Users.me(session)
-  // Users.state(session, 'LANDING_PAGE_PINS_INJECTED')
-  // Gatekeeper.activate('ads_log_plain_mobile_advertiser_id')
-  // Gatekeeper.experiments()
-  // Gatekeeper.activate('android_cgb')
-  // Users.me(session)
-  // Users.meBoards(session)
-  // Experiences.get(session)
-  // Conversations.get(session)
-  // Gatekeeper.activate('android_hashtag_feed_v2')
-  // Gatekeeper.activate('android_aggregated_pins')
-  // Gatekeeper.activate('homefeed_tuner_android')
-  // Notifications.get(session)
-  // Feeds.home(session)
-  // Users.meInterests(session)
-  // Feeds.home(session)
-  // Users.contactsSuggestions(session)
-  // var data1 = {
-  //   'requests': '[' + JSON.stringify({
-  //   'method':'PUT',
-  //   'uri':'/v3/experiences/20006:30012/viewed/'}) + ']'
-  // };
-  // var data2 = {
-  //   'requests': '[{"method":"GET","uri":"/v3/users/config/invitability/feature_weights/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/name_heuristics/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/settings/","params":{"snapshot_key":"0"}}]'
-  // };
-  // var data3 = {
-  //   'requests': "[" + JSON.stringify({
-  //                      "method": "PUT",
-  //                      "uri"   : "/v3/experiences/20006:30012/completed/"}) + "]" 
-  // };
-  // var data4 = {
-  //   'requests': '[{"method":"GET","uri":"/v3/experiences/","params":{"placement_ids":"20002"}}]' 
-  // };
+  var data1 = {
+    'requests': '[' + JSON.stringify({
+    'method':'PUT',
+    'uri':'/v3/experiences/20006:30012/viewed/'}) + ']'
+  };
+  var data2 = {
+    'requests': '[{"method":"GET","uri":"/v3/users/config/invitability/feature_weights/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/name_heuristics/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/settings/","params":{"snapshot_key":"0"}}]'
+  };
+  var data3 = {
+    'requests': "[" + JSON.stringify({
+                       "method": "PUT",
+                       "uri"   : "/v3/experiences/20006:30012/completed/"}) + "]" 
+  };
+  var data4 = {
+    'requests': '[{"method":"GET","uri":"/v3/experiences/","params":{"placement_ids":"20002"}}]' 
+  };
 
-  // Batch.post(session, data2)
-  // Orientation.signal(session)
-  // Users.interestsFavorited (session, myid) /// from users.me response
-  // Batch.post(session, data3)
-  // Experiences.get(session)
-  // Orientation.status(session)
-  // Batch.post(session, data4)
-  // Notifications.get(session)
- 
+  Client.Gatekeeper.experiments()
+    .then(function(res) {
+      return Client.Gatekeeper.activate('smartlock');
+    })
+    .then(function(res) {
+      return Client.Gatekeeper.activate('ads_log_plain_mobile_advertiser_id');
+    })
+    .then(function(res) {
+      return Client.Register.post(session, session.name, session.email, session.password) 
+    })
+    .then(function(res) {
+      var access_token = res.data;
+      session.setAuthorization(access_token);
+      return [session, Client.Users.me(session)];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Users.state(session, 'LANDING_PAGE_PINS_INJECTED')  ]
+    })
+    .spread(function(session, res) {
+      return [session, Client.Gatekeeper.activate('ads_log_plain_mobile_advertiser_id')];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Gatekeeper.experiments()];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Gatekeeper.activate('android_cgb')];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Users.me(session)];
+    })
+    .spread(function(session, res) {
+      session.setUserId(res.data.id);
+      return [session, Client.Users.meBoards(session)];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Experiences.get(session)];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Conversations.get(session)];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Gatekeeper.activate('android_hashtag_feed_v2')];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Gatekeeper.activate('android_aggregated_pins')];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Gatekeeper.activate('homefeed_tuner_android')];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Notifications.get(session)];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Feeds.home(session)];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Users.meInterests(session)];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Feeds.home(session)];
+    })  
+    .spread(function(session, res) {
+      return [session, Client.Users.contactsSuggestions(session)];
+    }) 
+    .spread(function(session, res) {
+      return [session, Client.Batch.post(session, data2)];
+    }) 
+    .spread(function(session, res) {
+      return [session, Client.Orientation.signal(session)];
+    }) 
+    .spread(function(session, res) {
+      return [session, Client.Orientation.signal(session)];
+    }) 
+    .spread(function(session, res) {
+      return [session, Client.Users.interestsFavorited(session, session.id) ];
+    })  
+    .spread(function(session, res) {
+      return [session, Client.Batch.post(session, data3) ];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Experiences.get(session) ];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Orientation.status(session) ];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Batch.post(session, data4) ];
+    })
+    .spread(function(session, res) {
+      return [session, Client.Notifications.get(session) ];
+    })
+    .spread(function(session, res) {
+      console.log(res);
+      cb(session);
+    })
+}
 
-  const NAMES = require('./config/names').names;
-  const SURNAMES = require('./config/names').surnames;
-
-  var Session = require('../pinterest-api/api/session')
-  var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
-  var email = name + 'llman@mailglobals.co';
-  var password = generatePassword();
- 
-  console.log(name, email, password)
-  var storage = __dirname + '/js/cookie.json'
-  var session = new Session(storage);
-  Client.Register.post(session, name, email, password) 
-  .then(function(session) {
-    if (session instanceof Session) {
-      console.log(session);
-      // appendStringFile(task.output_file, email + "|" + name + "|" + password);
-    }
-    
-    
+function fastCreateAccount(session, cb) {
+  Client.Register.post(session, session.name, session.email, session.password) 
+  .then(function(res) {
+    console.log(res);
+    var access_token = res.data;
+    session.setAuthorization(access_token);
+    cb(session);
   })
   .catch(function(err) {
     console.log(err);
   })
+}
+
+function apiCreateAccounts(task) {
+  
+  const NAMES = require('./config/names').names;
+  const SURNAMES = require('./config/names').surnames;
+  var Session = require('../pinterest-api/api/session');
+ 
+  // fullCreateAccount(session, function() {
+  //   appendStringFile(task.output_file, session.email + "|" + session.name + "|" + session.password);
+  // });
+
+  var proxy_array = fs.readFileSync(task.proxy_file, 'utf8').split('\n').filter(isEmpty);
+
+  if(!proxy_array || task.emails_cnt == 0) {
+    console.log("empty");
+    return;
+  }
+
+  for(var i = 0; i < task.emails_cnt / proxy_array.length ; i++) {
+
+    async.forEach(proxy_array, function(proxy, callback) {
+      // setProxyFunc(proxy);
+      var storage = __dirname + '/js/cookie' + proxy + '.json'
+      fs.closeSync(fs.openSync(storage, 'w') );
+      var session = new Session(storage);
+      var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
+      var password = generatePassword(); 
+      session.setName(name);
+      session.setEmail(name + 'llman@mailglobals.co');
+      session.setPassword(password);
+
+      fastCreateAccount(session, function(session) {
+        appendStringFile(task.output_file, session.email + "|" + session.name + "|" + session.password);
+        callback();
+      });
+    }, function(err) {
+      console.log('iterating done');
+    });
+
+
+  }
 
 }
 

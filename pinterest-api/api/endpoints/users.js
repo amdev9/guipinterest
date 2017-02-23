@@ -12,7 +12,8 @@ Users.me = function(session) {
     .setResource('users_me', { 
       params: querystring.stringify(data) 
     })
-    .send();
+    .send()
+
 }
 
 Users.get = function(session) {
@@ -36,7 +37,7 @@ Users.interestsFavorited = function(session, userId) {
   return new Request(session)
     .setMethod('GET')
     .setResource('users_interests_favorited', { 
-      user_id: userId, 
+      id: userId, 
       params: querystring.stringify(data) 
     })
     .send();
@@ -150,12 +151,12 @@ Users.state = function(session, state) { // LANDING_PAGE_PINS_INJECTED, MOBILE_C
     "value": 1
   };
   return new Request(session)
-    .setMethod('PUT')
+    .setMethod('GET')
     .setData(data)
     .setResource('users_state', { 
       state: state
     })
-    .send();
+    .send()
 }
 
 Users.setAvatar = function(session, filepath) {

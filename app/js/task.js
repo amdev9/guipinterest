@@ -96,16 +96,19 @@ function saveFile(selector) {
 document.getElementById("parsed_own_emails").disabled = true;
 document.getElementById("clean_own_emails").disabled = true;
 document.getElementById("open_own_emails").disabled = true;
+document.getElementById("reg_count").disabled = false;
 
 function checkDisabler() {
   if (document.getElementById('own_emails').checked == true) {
     document.getElementById("parsed_own_emails").disabled = false;
     document.getElementById("clean_own_emails").disabled = false;
     document.getElementById("open_own_emails").disabled = false;
+    document.getElementById("reg_count").disabled = true;
   } else {
+    document.getElementById("open_own_emails").disabled = true;
     document.getElementById("parsed_own_emails").disabled = true;
     document.getElementById("clean_own_emails").disabled = true;
-    document.getElementById("open_own_emails").disabled = true;
+    document.getElementById("reg_count").disabled = false;
   }
 }
 
@@ -114,6 +117,7 @@ function editCreateAccounts(task) {
   updateElemView(['create_accounts']);
   document.getElementById("proxy_file").value = task.proxy_file;
   document.getElementById("output_file").value = task.output_file;
+  document.getElementById("reg_count").value = task.emails_cnt;
 }
  
 function createAccounts(taskName) {
@@ -125,13 +129,16 @@ function createAccounts(taskName) {
   } else {
     task._id = new Date().toISOString();
   }
+  
   task.status = '-';
   task.name = taskName;
   task.type = 'task';
   task.email_parsed = '';
   if(document.getElementById("own_emails").checked == true) {
-    var emailParsed = document.getElementById("parsed_own_emails").value.split('\n');
-    task.email_parsed = emailParsed.filter(isEmpty);
+    task.email_parsed = document.getElementById("parsed_own_emails").value.split('\n').filter(isEmpty);
+    task.emails_cnt = task.email_parsed.length;
+  } else {
+    task.emails_cnt = document.getElementById("reg_count").value;
   }
   task.proxy_file = document.getElementById("proxy_file").value;
   task.output_file = document.getElementById("output_file").value;

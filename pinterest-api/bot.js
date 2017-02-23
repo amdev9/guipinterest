@@ -2,15 +2,37 @@ var _ = require('lodash')
 var pin = require("./index")
 
 var Session = require('./api/session')
-
-
-
+ 
 var storage = 'cookie.json'
 var session = new Session(storage);
-pin.Register.post(session, 'Angealaiaaze', 'Angealizeapaaullman@mailglobals.co', 'C4MSCZJO') 
-.then(function(res) {
-  console.log(res);
-})
+
+function generatePassword() {
+  return Math.random().toString(36).slice(-8).toUpperCase();
+}
+
+const NAMES = require('../app/config/names').names;
+const SURNAMES = require('../app/config/names').surnames;
+
+
+var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
+var email = name + 'llman@mailglobals.co';
+var password = generatePassword();
+
+console.log(name, email, password)
+
+
+  
+ 
+ 
+
+
+
+// var storage = 'cookie.json'
+// var session = new Session(storage);
+// pin.Register.post(session, 'Angealaiaaze', 'Angealizeapaaullman@mailglobals.co', 'C4MSCZJO') 
+// .then(function(res) {
+//   console.log(res);
+// })
 
 // pin.Session.create('cookies.json', 'blackkorol@gmail.com', 'qweqwe123')
 // .then(function (session) {

@@ -160,7 +160,9 @@ Request.prototype.send = function(options, attemps) {
     .spread(_.bind(this.beforeParse, this))
     .then(_.bind(this.parseMiddleware, this))
     .then(function (response) {
-      return response;
+      
+      return response.body;
+      
     })
     .catch(function(error) {
       console.log(error);

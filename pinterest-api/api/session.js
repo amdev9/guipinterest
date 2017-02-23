@@ -8,6 +8,7 @@ var request = require('request-promise');
 
 function Session(storage) {
   this.setCookiesStorage(storage);
+
 }
 
 util.inherits(Session, Resource);
@@ -18,12 +19,52 @@ Object.defineProperty(Session.prototype, "jar", {
   set: function(val) {}
 });
 
+Object.defineProperty(Session.prototype, "id", {
+  get: function() { return this._id },
+  set: function(val) {}
+});
+
+Object.defineProperty(Session.prototype, "name", {
+  get: function() { return this._name },
+  set: function(val) {}
+});
+
+Object.defineProperty(Session.prototype, "email", {
+  get: function() { return this._email },
+  set: function(val) {}
+});
+
+Object.defineProperty(Session.prototype, "password", {
+  get: function() { return this._password },
+  set: function(val) {}
+});
+
 Object.defineProperty(Session.prototype, "Authorization", {
   get: function() {   
     return this._Authorization;
   },
   set: function(val) {}
 });
+
+Session.prototype.setName = function(name) {
+  this._name = name;
+  return this;
+};
+
+Session.prototype.setPassword = function(password) {
+  this._password = password;
+  return this;
+};
+
+Session.prototype.setEmail = function(email) {
+  this._email = email;
+  return this;
+};
+
+Session.prototype.setUserId = function(id) {
+  this._id = id;
+  return this;
+};
 
 Session.prototype.setCookiesStorage = function(storage) {
   this._jar = request.jar(new FileCookieStore(storage)); 
