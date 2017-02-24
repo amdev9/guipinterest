@@ -6,6 +6,10 @@ var config = require('config');
 var softname = config.get('App.softname');
 
 document.title = "Добавление задания | " + softname 
+document.getElementById("own_emails").addEventListener("click",function(){
+  checkDisabler();
+}, false)
+checkDisabler();
 
 ipc.on('closing', () => {});
 
@@ -115,6 +119,7 @@ function editCreateAccounts(task) {
   document.getElementById("proxy_file").value = task.proxy_file;
   document.getElementById("output_file").value = task.output_file;
   document.getElementById("reg_count").value = task.emails_cnt;
+  checkDisabler();
 }
  
 function createAccounts(taskName) {
