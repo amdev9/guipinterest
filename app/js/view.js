@@ -181,12 +181,12 @@ function deleteRowsView(rows) {
 
 function renderTaskRowView(task_id, taskName) { 
   var taskHtml = `<tr class="task" data-id="${task_id}" state="stopped" type="task">
-                  <td>-</td>
-                  <td>-</td>
-                  <td>${taskName}</td>
-                  <td>Остановлен</td>
-                  <td>-</td>
-                  <td>-</td></tr>`;
+    <td>-</td>
+    <td>-</td>
+    <td>${taskName}</td>
+    <td>Остановлен</td>
+    <td>-</td>
+    <td>-</td></tr>`;
   $('#table1').append(taskHtml);
 }
 

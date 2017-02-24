@@ -128,7 +128,6 @@ function parseConcurrentsUserDb(result) {
     dotation[i] = dotation[i-1]+div;
   }
   users.forEach( function(user, i , arr) {
-
     let db_object = {
       _id: user._id,
       username: user.username, 
@@ -151,7 +150,6 @@ function parseConcurrentsUserDb(result) {
     }).catch(function (err) {
       console.log(err);
     });
-
   });
 }
 
