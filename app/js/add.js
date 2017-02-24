@@ -15,6 +15,12 @@ ipc.on('selected_accounts', (event, message) => {
   }
 });
 
+function isEmpty(x) {
+  if (x !== "") {
+    return true;
+  }
+}
+
 var openFile = function(selector) {
   const {dialog} = require('electron').remote
   var path = dialog.showOpenDialog({properties: ['openFile']}); // , 'openDirectory'
@@ -26,17 +32,8 @@ var openFile = function(selector) {
 var parseDataFileToArray = (selector) => {
   var filename = document.getElementById(selector).value;
   fs.readFile(filename, function(err, f) {
-    var array = f.toString().split('\n');
-    array.forEach( function (item, i , arr) { // FIX pass array 
-      if (item.length > 0 ) {
-        var arr = item.split('|');
-        var user = {};
-        user.username = arr[0];   
-        user.password = arr[1];
-        user.proxy = arr[2];
-        ipc.send('user_add', user);
-      } 
-    });
+    var array = f.toString().split('\n').filter(isEmpty);
+    ipc.send('users_add', array);
     window.close(); 
   });
 }

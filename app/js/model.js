@@ -13,7 +13,7 @@ const os = require('os');
 var tmpdir = os.tmpdir();
 var config = require('config');
 var dbname = config.get('App.dbname');
-
+var log = require('electron-log');
 
 var levelpath = path.join(tmpdir, dbname);
 var db = new PouchDB( levelpath , {adapter: 'leveldb'});
@@ -29,7 +29,6 @@ function dropDb() {
   });
 }
 
- 
 function createAccountsTaskDb(task) {
   db.put(task).then(function (response) {
     if(!task._rev) {
@@ -58,21 +57,31 @@ function getTaskDb(row_id, webcontents) {
   });
 }
 
-function addUserDb(user) {
-  db.put({
-    _id: user.username,
-    username: user.username,
-    proxy: user.proxy,
-    password: user.password,
-    type: 'user',
-    cookie: '',
-    task: '-',
-    status: '-'
-  }).then(function (response) {
-    renderUserRowView(user);
-  }).catch(function (err) {
-    console.log(err);
-  });
+function addUsersDb(users) {
+  users.forEach(function(userString, i, fullArr) {
+    var userArr = userString.split('|');
+    var usersObjArr = [];
+    if (userArr.length == 3) {
+      var user = {};
+      user._id = userArr[0];
+      user.username = userArr[0];   
+      user.password = userArr[1];
+      user.proxy = userArr[2];
+      user.type = 'user';
+      user.cookie = '';
+      user.task = '-';
+      user.status = '-';
+      usersObjArr.push(user);
+      if ( i == fullArr.length - 1 ) {
+        db.bulkDocs(usersObjArr)
+          .then(function (response) {
+          renderUserRowView(usersObjArr);
+        }).catch(function (err) {
+          console.log(err);
+        });
+      }
+    }
+  }); 
 }
 
 function runTasksDb(rows) {
@@ -138,7 +147,7 @@ function parseConcurrentsUserDb(result) {
       _rev: user._rev 
     };
     return db.put(db_object).then(function (result) {
-      userTaskRenderView(user._id, taskName);
+      setTaskView(user._id, taskName);
     }).catch(function (err) {
       console.log(err);
     });
@@ -196,7 +205,7 @@ function filtrationUserDb() {
         _rev: user._rev
       };
       return db.put(db_object).then(function (result) {
-        userTaskRenderView(user._id, taskName);
+        setTaskView(user._id, taskName);
       }).catch(function (err) {
         console.log(err);
       });
@@ -398,18 +407,14 @@ function initViewDb() {
       include_docs: true
     });
   }).then(function (result) {
-    result.rows.forEach( function (task) {
-      initTaskRowRenderView(task); // pass all result.rows and make one append
-    });
+    initTaskRowRenderView(result.rows);
   }).then(function () {
     return db.query('index', {
       key: 'user',
       include_docs: true
     });
   }).then(function (result) {
-    result.rows.forEach( function (user) {
-      initUserRowRenderView(user); // pass all result.rows and make one append
-    });
+    initUserRowRenderView(result.rows); 
   }).catch(function (err) {
     console.log(err);
   });

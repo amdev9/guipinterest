@@ -15,12 +15,14 @@ $(function() {
       output_file: "required",
       reg_count: "required",
       parsed_own_emails: "required",
+      reg_timeout: "required"
     },
     messages: {
       proxy_file: "Выберите файл",
       output_file: "Выберите файл",
       reg_count: "Введите кол-во",
       parsed_own_emails: "Введите почты для регистрации",
+      reg_timeout: "Введите задержку"
     },
     highlight: function(element) {
       $(element).closest('.form-group').addClass('has-danger');

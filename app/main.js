@@ -17,8 +17,8 @@ autoUpdater.logger.transports.file.level = "info"
 
 var mainWindow = null;
 
-ipc.on('user_add', (event, user) => {
-  mainWindow.webContents.send('add', user);
+ipc.on('users_add', (event, users) => {
+  mainWindow.webContents.send('add', users);
 });
 
 ipc.on('user_edit', (event, user) => {

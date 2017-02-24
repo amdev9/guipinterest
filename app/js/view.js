@@ -38,20 +38,126 @@ $(function() {
   });
 });
 
-function getStateView(user_id) { 
-  var state = $('#table1 tr[data-id="' + user_id +'"]').attr('state');
-  return state;
+function changeTrThemeView(id, theme) {
+  $('#table1 tr[data-id="' + id + '"]').removeClass().addClass(theme);
 }
 
-function addStopStateView(user_id) {
-  var state = $('#table1 tr[data-id="' + user_id +'"]').attr('state')
-  if (state != 'stopped') {
-    $('#table1 tr[data-id="' + user_id[0] + '"]').attr('state', 'stop');
+function setUsernameView(id, username) {
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(0).html(username);
+}
+
+function setProxyView(id, proxy) {
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(1).html(proxy);
+}
+
+function setTaskView(id, taskType) {
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(2).html(taskType);
+}
+
+function updateStateView(id, message) {
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(3).html(message);
+}
+
+function setStateView(id, state) {
+  $('#table1 tr[data-id="' + id + '"]').attr('state', state);
+  switch(state) {
+    case 'run':
+      updateStateView(id, 'В работе');
+      break;
+    case 'stop':
+      updateStateView(id, 'Останавливаем');
+      changeTrThemeView(id, 'table-warning');
+      break;
+    case 'stopped':
+      updateStateView(id, 'Остановлен');
+      changeTrThemeView(id, 'table-info');
+      break;
+    default:
+      updateStateView(id, 'Остановлен');
   }
 }
 
-function deleteStopStateView(user_id) {
-  $('#table1 tr[data-id="' + user_id + '"]').attr('state', 'stopped');
+function getStateView(id) {
+  return $('#table1 tr[data-id="' + id +'"]').attr('state');
+}
+
+function setCompleteView(id, complete) {
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(4).html(complete);
+}
+
+function getCompleteView(id, complete) {
+  return $('#table1 tr[data-id="' + id + '"]').find("td").eq(4).html();
+}
+
+function setStatusView(id, status) {
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(5).html(status);
+}
+
+function addStopStateView(rows_ids) {
+  rows_ids.forEach( function(user_id) {
+    var state = getStateView(user_id);
+    if (state != 'stopped') {
+      setStateView(user_id, 'stop');
+    }
+  })
+}
+
+function initTaskRowRenderView(tasks) {
+  var tasksHtml = "";
+  tasks.forEach(function(task) { // class="task"??
+    var oneTaskHtml = `<tr data-id="${task.doc._id}" state="stopped" type="task">
+      <td>-</td>
+      <td>-</td>
+      <td>${ task.doc.name }</td>
+      <td>Остановлен</td>
+      <td>-</td>
+      <td>${task.doc.status}</td></tr>`;
+    tasksHtml += oneTaskHtml;
+  });
+  $('#table1').append(tasksHtml);
+}
+
+function initUserRowRenderView(users) {
+  var usersHtml = "";
+  users.forEach(function(user) {
+    var oneUserHtml = `<tr data-id="${user.doc._id}" state="stopped">
+      <td>${user.doc.username}</td>
+      <td>${ user.doc.proxy != '' ? user.doc.proxy : "-" }</td>
+      <td>${ user.doc.task != '-' ? user.doc.task.name : "-"}</td>
+      <td>Остановлен</td>
+      <td>-</td>
+      <td>${user.doc.status}</td></tr>`;
+    usersHtml += oneUserHtml;
+  });
+  $('#table1').append(usersHtml);
+}
+
+function userRowRenderView(user_id) {
+  db.get(user_id).then(function(user) {  
+    setUsernameView(user._id, user.username);
+    if (user.proxy != '') {
+      setProxyView(user._id, user.proxy);
+    } else {
+      setProxyView(user._id, "-");
+    }
+    setStatusView(user._id, user.status);    
+  }).then(function() {
+    setStateView(user_id, 'stopped');
+  }).catch(function (err) {
+    console.log(err);
+  });
+}
+
+function renderTaskCompletedView(user_id) {
+  var currentValue = +getCompleteView(user_id);
+  currentValue++;
+  setCompleteView(user_id, currentValue);
+
+  // if (indicator == limit) {
+  //   updateTaskStatusDb(user_id, 'Активен');
+  //   updateStateView(user_id, 'Остановлен');
+  //   loggerDb(user_id, 'Работа завершена')
+  // }
 }
 
 function renderUserCompletedView (user_id, indicator, limit) {  //// FIX
@@ -63,30 +169,8 @@ function renderUserCompletedView (user_id, indicator, limit) {  //// FIX
   }
 }
 
-function renderTaskCompletedView(user_id) {  //// add to current value of indicator (get -> plus -> set)
-  var currentValue = +$('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html();
-  currentValue++;
-  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html(currentValue);
-
-  // if (indicator == limit) {
-  //   updateTaskStatusDb(user_id, 'Активен');
-  //   updateStateView(user_id, 'Остановлен');
-  //   loggerDb(user_id, 'Работа завершена')
-  // }
-}
-
-
 function renderNewTaskCompletedView(user_id) {
   $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html(0);
-}
-
-function updateStateView(user_id, state) { // rewrite with jquery find filed == eq(3)
-  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(3).html(state);
-  if (state == 'В работе') {
-    $('#table1 tr[data-id="' + user_id + '"]').attr('state', 'run');
-  } else {
-    $('#table1 tr[data-id="' + user_id + '"]').attr('state', 'stopped');
-  }
 }
 
 function deleteRowsView(rows) {
@@ -95,66 +179,30 @@ function deleteRowsView(rows) {
   });
 }
 
-function userTaskRenderView(row_id, taskType) {
-  $('#table1 tr[data-id="' + row_id + '"]').find("td").eq(2).html(taskType);
-}
-
-function initUserRowRenderView(user) { // rewrite to with $.each
-  var userlist = `<tr data-id="${user.doc._id}" state="stopped">
-                  <td>${user.doc.username}</td>
-                  <td>${ user.doc.proxy != '' ? user.doc.proxy : "-" }</td>
-                  <td>${ user.doc.task != '-' ? user.doc.task.name : "-"}</td>
-                  <td>Остановлен</td>
-                  <td>-</td>
-                  <td>${user.doc.status}</td></tr>`;
-  $('#table1').append(userlist);
-}
-
-function initTaskRowRenderView(task) { // rewrite to with $.each
-  var userlist = `<tr data-id="${task.doc._id}" state="stopped" type="task">
-                  <td>-</td>
-                  <td>-</td>
-                  <td>${ task.doc.name }</td>
-                  <td>Остановлен</td>
-                  <td>-</td>
-                  <td>${task.doc.status}</td></tr>`;
-  $('#table1').append(userlist);
-}
-
-function renderTaskRowView(task_id, taskName) { // rewrite to with $.each
-  var userlist = `<tr class="task" data-id="${task_id}" state="stopped" type="task">
+function renderTaskRowView(task_id, taskName) { 
+  var taskHtml = `<tr class="task" data-id="${task_id}" state="stopped" type="task">
                   <td>-</td>
                   <td>-</td>
                   <td>${taskName}</td>
                   <td>Остановлен</td>
                   <td>-</td>
                   <td>-</td></tr>`;
-  $('#table1').append(userlist);
+  $('#table1').append(taskHtml);
 }
 
-function renderUserRowView(user) { // rewrite to with $.each
-  var userlist = `<tr class="task" data-id="${user.username}" state="stopped">
-                  <td>${user.username}</td>
-                  <td>${ user.proxy != '' ? user.proxy : '-'}</td>
-                  <td>-</td>
-                  <td>Остановлен</td>
-                  <td>-</td>
-                  <td>-</td></tr>`;
-  $('#table1').append(userlist);
-}
-
-function userRowRenderView(user_id) {
-  db.get(user_id).then(function(user) {  
-    $('#table1 tr[data-id="' + user._id + '"]').find("td").eq(0).html(user.username);
-    if (user.proxy != '') {
-      $('#table1 tr[data-id="' + user._id + '"]').find("td").eq(1).html(user.proxy);
-    } else {
-      $('#table1 tr[data-id="' + user._id + '"]').find("td").eq(1).html("-");
-    }
-    $('#table1 tr[data-id="' + user._id + '"]').find("td").eq(5).html(user.status);    
-  }).then(function() {
-    updateStateView(user_id, 'Остановлен');
-  }).catch(function (err) {
-    console.log(err);
+function renderUserRowView(users) {
+  var usersHtml = "";
+  users.forEach(function(user) {
+    var oneUserHtml = `<tr class="task" data-id="${user.username}" state="stopped">
+      <td>${user.username}</td>
+      <td>${ user.proxy != '' ? user.proxy : '-'}</td>
+      <td>-</td>
+      <td>Остановлен</td>
+      <td>-</td>
+      <td>-</td></tr>`;
+    usersHtml += oneUserHtml;
   });
+  $('#table1').append(usersHtml);
 }
+
+

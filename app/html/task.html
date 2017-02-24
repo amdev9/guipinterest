@@ -33,7 +33,6 @@
           <form id="create_accounts_form">
             <div class="offset-1 col-10">
 
-
             <div class="form-group row align-items-center">
               <label for="reg_count" class="col-form-label form-control-sm offset-1">Кол-во аккаунтов к регистрации</label>
               <div class="col-3">
@@ -69,6 +68,13 @@
                 <span class="input-group-btn">
                   <button onclick="saveFile('proxy_file')" class="btn btn-secondary btn-sm" type="button">Выбрать файл с прокси</button>
                 </span>
+              </div>
+            </div>
+
+            <div class="form-group row align-items-center">
+              <label for="reg_count" class="col-form-label form-control-sm offset-1">Задержка между регистрациями для 1 прокси (сек)</label>
+              <div class="col-3">
+                <input class="form-control form-control-sm" type="number" value="0" min="0" name="reg_timeout" id="reg_timeout">
               </div>
             </div>
 

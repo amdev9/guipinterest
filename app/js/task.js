@@ -116,6 +116,7 @@ function editCreateAccounts(task) {
   $("div.container").data('task', { _id: task._id, _rev: task._rev });
   updateElemView(['create_accounts']);
   document.getElementById("own_emails").checked = task.own_emails;
+  document.getElementById("reg_timeout").value = task.reg_timeout;
   document.getElementById("proxy_file").value = task.proxy_file;
   document.getElementById("output_file").value = task.output_file;
   if (document.getElementById("own_emails").checked) {
@@ -146,6 +147,7 @@ function createAccounts(taskName) {
   } else {
     task.emails_cnt = document.getElementById("reg_count").value;
   }
+  task.reg_timeout = document.getElementById("reg_timeout").value;
   task.proxy_file = document.getElementById("proxy_file").value;
   task.output_file = document.getElementById("output_file").value;
 

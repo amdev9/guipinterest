@@ -6,8 +6,8 @@ const ipc = require('electron').ipcRenderer;
 ////////////// EVENTS ///////////////
 /////////////////////////////////////
 
-ipc.on('add', (event, user) => {
-  addUserDb(user);
+ipc.on('add', (event, users) => {
+  addUsersDb(users);
 });
 
 ipc.on('edit', (event, user) => {
