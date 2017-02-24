@@ -93,11 +93,7 @@ function saveFile(selector) {
   }
 }
 
-document.getElementById("parsed_own_emails").disabled = true;
-document.getElementById("clean_own_emails").disabled = true;
-document.getElementById("open_own_emails").disabled = true;
-document.getElementById("reg_count").disabled = false;
-
+ 
 function checkDisabler() {
   if (document.getElementById('own_emails').checked == true) {
     document.getElementById("parsed_own_emails").disabled = false;
@@ -115,6 +111,7 @@ function checkDisabler() {
 function editCreateAccounts(task) {
   $("div.container").data('task', { _id: task._id, _rev: task._rev });
   updateElemView(['create_accounts']);
+  document.getElementById("own_emails").checked = task.own_emails;
   document.getElementById("proxy_file").value = task.proxy_file;
   document.getElementById("output_file").value = task.output_file;
   document.getElementById("reg_count").value = task.emails_cnt;
@@ -134,9 +131,9 @@ function createAccounts(taskName) {
   task.name = taskName;
   task.type = 'task';
   task.email_parsed = '';
+  task.own_emails = document.getElementById("own_emails").checked;
   if(document.getElementById("own_emails").checked == true) {
     task.email_parsed = document.getElementById("parsed_own_emails").value.split('\n').filter(isEmpty);
-    task.emails_cnt = task.email_parsed.length;
   } else {
     task.emails_cnt = document.getElementById("reg_count").value;
   }

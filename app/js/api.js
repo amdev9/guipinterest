@@ -454,40 +454,52 @@ function apiCreateAccounts(task) {
   const SURNAMES = require('./config/names').surnames;
   var Session = require('../pinterest-api/api/session');
  
-  // fullCreateAccount(session, function() {
-  //   appendStringFile(task.output_file, session.email + "|" + session.name + "|" + session.password);
-  // });
-
   var proxy_array = fs.readFileSync(task.proxy_file, 'utf8').split('\n').filter(isEmpty);
+  var email_array = [];
 
-  if(!proxy_array || task.emails_cnt == 0) {
+  if (!task.own_emails) {
+    for(var i = 0; i < task.emails_cnt; i++) {
+      var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
+      email_array.push(name + 'llman@mailglobals.co');
+    }
+  } else {
+    email_array = task.email_array;
+  }
+
+  if(!proxy_array || email_array.length == 0) {
     console.log("empty");
     return;
   }
 
-  for(var i = 0; i < task.emails_cnt / proxy_array.length ; i++) {
+  var obj = {}
+  email_array.forEach(function(value, index) {
+    if(index < proxy_array.length) {
+      obj[value] = proxy_array[index];
+    } else {
+      var fInd = Math.floor(index/proxy_array.length);
+      var correctedIndex = (index - fInd*proxy_array.length);
+      obj[value] = proxy_array[correctedIndex];
+    }
+  });
+   
+  async.mapValues(obj, function (proxy, email, callback) {
+    // set proxy
+    var storage = __dirname + '/cookies/' + email + '.json'
+    fs.closeSync(fs.openSync(storage, 'w') );
+    var session = new Session(storage);
+    var password = generatePassword(); 
+    session.setName(name);
+    session.setEmail(email);
+    session.setPassword(password);
 
-    async.forEach(proxy_array, function(proxy, callback) {
-      // setProxyFunc(proxy);
-      var storage = __dirname + '/js/cookie' + proxy + '.json'
-      fs.closeSync(fs.openSync(storage, 'w') );
-      var session = new Session(storage);
-      var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
-      var password = generatePassword(); 
-      session.setName(name);
-      session.setEmail(name + 'llman@mailglobals.co');
-      session.setPassword(password);
-
-      fastCreateAccount(session, function(session) {
-        appendStringFile(task.output_file, session.email + "|" + session.name + "|" + session.password);
-        callback();
-      });
-    }, function(err) {
-      console.log('iterating done');
+    fastCreateAccount(session, function(session) {
+      appendStringFile(task.output_file, session.email + "|" + session.name + "|" + session.password);
+      callback();
     });
 
-
-  }
+  }, function(err, result) {
+    console.log("DONE!");
+  });
 
 }
 

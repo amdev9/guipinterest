@@ -1,0 +1,25 @@
+<head>
+    <script>
+        function Init() {
+            var checkbox = document.getElementById ("myCheckbox");
+            if (checkbox.addEventListener) {
+                checkbox.addEventListener ("CheckboxStateChange", OnChangeCheckbox, false);
+            }
+        }
+
+        function OnChangeCheckbox (event) {
+            var checkbox = event.target;
+            if (checkbox.checked) {
+                alert ("The check box is checked.");
+            }
+            else {
+                alert ("The check box is not checked.");
+            }
+        }
+    </script>
+</head>
+<body onload="Init()">
+    Toggle the checked state of the following checked box:<br /><br />
+    <input type="checkbox" id="myCheckbox" />
+    <label for="myCheckbox">Sample check box</label>
+</body>
