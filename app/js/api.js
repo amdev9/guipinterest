@@ -9,7 +9,8 @@ const fs = require('fs');
 var Promise = require('bluebird');
 var cookieDir = os.tmpdir() + '/cookie/';
 var async = require('async');
-var _ = require('lodash')
+var _ = require('lodash');
+var config = require('config');
 
 function fullCreateAccount(session, cb) {
 
@@ -186,7 +187,9 @@ function apiCreateAccounts(task) {
     var func = function(results) {
       
       async.mapValues(_.object(email_tuple[i], proxy_array), function (proxy, email, callback) {
-        // set proxy
+        if(config.get('App.devTools') == false) {
+          setProxyFunc(proxy);
+        }
         var storage = cookieDir + email + '.json'
         fs.closeSync(fs.openSync(storage, 'w') );
         var session = new Session(storage);
