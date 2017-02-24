@@ -118,7 +118,11 @@ function editCreateAccounts(task) {
   document.getElementById("own_emails").checked = task.own_emails;
   document.getElementById("proxy_file").value = task.proxy_file;
   document.getElementById("output_file").value = task.output_file;
-  document.getElementById("reg_count").value = task.emails_cnt;
+  if (document.getElementById("own_emails").checked) {
+    document.getElementById("parsed_own_emails").value = task.email_parsed.join('\n');
+  } else {
+    document.getElementById("reg_count").value = task.emails_cnt;
+  }
   checkDisabler();
 }
  
