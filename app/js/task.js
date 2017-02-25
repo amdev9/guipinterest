@@ -2,8 +2,8 @@ ipc = require('electron').ipcRenderer;
 const fs = require("fs");
 window.$ = window.jQuery = require('jquery');
 const {dialog} = require('electron').remote
-var config = require('config');
-var softname = config.get('App.softname');
+var config = require('../config/default');
+var softname = config.App.softname;
 
 document.title = "Добавление задания | " + softname 
 document.getElementById("own_emails").addEventListener("click",function(){

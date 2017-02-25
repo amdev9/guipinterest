@@ -11,8 +11,8 @@ var readFilePromise = Promise.promisify(require("fs").readFile);
 var path = require('path');
 const os = require('os');
 var tmpdir = os.tmpdir();
-var config = require('config');
-var dbname = config.get('App.dbname');
+var config = require('./config/default');
+var dbname = config.App.dbname;
 var log = require('electron-log');
 
 var levelpath = path.join(tmpdir, dbname);
@@ -75,7 +75,14 @@ function addUsersDb(users) {
       if ( i == fullArr.length - 1 ) {
         db.bulkDocs(usersObjArr)
           .then(function (response) {
-          renderUserRowView(usersObjArr);
+            response.forEach(function(item, i, arr) {
+              if (item.error == true) {
+                usersObjArr.splice(i, 1);
+              }
+              if (i == arr.length - 1) {
+                renderUserRowView(usersObjArr);
+              }
+            });
         }).catch(function (err) {
           console.log(err);
         });

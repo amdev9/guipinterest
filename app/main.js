@@ -8,8 +8,8 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
 var log = require('electron-log');
-var config = require('config');
-var devIsOpen = config.get('App.devTools');
+var config = require('./config/default');
+var devIsOpen = config.App.devTools;
 
 const autoUpdater = require("electron-updater").autoUpdater;
 autoUpdater.logger = require("electron-log")

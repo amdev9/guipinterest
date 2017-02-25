@@ -1,8 +1,9 @@
 ipc = require('electron').ipcRenderer;
 const fs = require("fs");
 window.$ = window.jQuery = require('jquery');
-var config = require('config');
-var softname = config.get('App.softname');
+var config = require('../config/default');
+var softname = config.App.softname;
+
 
 document.title = "Редактирование аккаунта | " + softname
 

@@ -1,5 +1,4 @@
 {
-  // Customer module configs
   "App": {
     "softname": "PinBOT",
     "devTools": true,

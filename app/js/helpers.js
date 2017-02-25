@@ -4,6 +4,8 @@
 
 'use strict';
 
+var fs = require('fs');
+
 function setProxyFunc(proxyString) {
   if(proxyString.split(":").length == 2) {
     let proxy_ip = proxyString.split(":")[0];

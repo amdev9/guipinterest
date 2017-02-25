@@ -16,7 +16,7 @@ PinterestAPI.Register = require('./api/endpoints/register')
 PinterestAPI.Search = require('./api/endpoints/search')
 PinterestAPI.Users = require('./api/endpoints/users')
 
-PinterestAPI.Request = require('./api/request');
+PinterestAPI.Request = require('./api/request')
 PinterestAPI.Constants = require('./api/constants')
 PinterestAPI.Resource = require('./api/resource')
 PinterestAPI.Session = require('./api/session')

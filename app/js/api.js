@@ -4,13 +4,13 @@
 
 'use strict';
 
-const Client = require('../pinterest-api'); 
-const fs = require('fs');
+var Client = require('./pinterest-api'); 
+var fs = require('fs');
 var Promise = require('bluebird');
 var cookieDir = os.tmpdir() + '/cookie/';
 var async = require('async');
 var _ = require('lodash');
-var config = require('config');
+var config = require('./config/default');
 
 function fullCreateAccount(session, cb) {
 
@@ -143,11 +143,12 @@ function fastCreateAccount(session, cb) {
 
 function apiCreateAccounts(task) {
   setStateView(task._id, 'run');
+  loggerDb(task._id, 'Регистрация аккаунтов');
   setCompleteView(task._id, 0);
   checkFolderExists(cookieDir);
   const NAMES = require('./config/names').names;
   const SURNAMES = require('./config/names').surnames;
-  var Session = require('../pinterest-api/api/session');
+  var Session = require('./pinterest-api/api/session');
  
   var proxy_array = fs.readFileSync(task.proxy_file, 'utf8').split('\n').filter(isEmpty);
   var email_array = [];
@@ -187,7 +188,7 @@ function apiCreateAccounts(task) {
     var func = function(results) {
       
       async.mapValues(_.object(email_tuple[i], proxy_array), function (proxy, email, callback) {
-        if(config.get('App.devTools') == false) {
+        if(config.App.devTools == false) {
           setProxyFunc(proxy);
         }
         var storage = cookieDir + email + '.json'
@@ -235,10 +236,16 @@ function apiCreateAccounts(task) {
       }, task.reg_timeout * 1000);
     });
   };
-  promiseWhile(actionFunc, chunked);
+  promiseWhile(actionFunc, chunked)
+    .then(function() {
+      loggerDb(task._id, 'Регистрация остановлена');  
+    }).catch(function (err) {
+      console.log(err);
+    });
 }
 
 function apiSessionCheck(user_id, username, password) { // add proxy // ADD ERROR DESCRIBER
+  console.log(cookieDir);
   checkFolderExists(cookieDir);
   var filepath = cookieDir + user_id + ".json";
   createFile(filepath);

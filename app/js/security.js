@@ -5,8 +5,8 @@
 var https = require('https');
 var Registry = require('winreg');
 const crypto = require('crypto');
-var config = require('config');
-var host = config.get('App.hostname');
+var config = require('./config/default');
+var host = config.App.hostname;
 
 function checkLicense(cb) {
   if (process.platform == 'win32') {
