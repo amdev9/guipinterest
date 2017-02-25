@@ -51,7 +51,7 @@
     "appId": "gnu.alexpro",
     "mac": {
       "category": "private.app-category.productivity",
-      "icon": "/Users/alex/dev/nodejs/guipinterest/app/build/marvel-app.icns"
+      "icon": "/Users/alex/dev/nodejs/guipinterest/build/marvel-app.icns"
     },
     "win": {
       "icon": ""
