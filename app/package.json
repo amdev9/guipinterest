@@ -1,9 +1,9 @@
 {
-  "name": "guinstabot",
+  "name": "guipinterest",
   "private": true,
-  "productName": "InstaBOT",
+  "productName": "PinBOT",
   "version": "0.0.1",
-  "description": "GUI instagram activities application",
+  "description": "GUI pinterest app",
   "author": "Alex <alexpro@mail.gnu>",
   "main": "main.js",
   "scripts": {
