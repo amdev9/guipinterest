@@ -38,10 +38,6 @@ $(function() {
   });
 });
 
-function changeTrThemeView(id, theme) {
-  $('#table1 tr[data-id="' + id + '"]').removeClass().addClass(theme);
-}
-
 function setUsernameView(id, username) {
   $('#table1 tr[data-id="' + id + '"]').find("td").eq(0).html(username);
 }
@@ -54,26 +50,36 @@ function setTaskView(id, taskType) {
   $('#table1 tr[data-id="' + id + '"]').find("td").eq(2).html(taskType);
 }
 
-function updateStateView(id, message) {
+function setStateMessage(id, message) {
   $('#table1 tr[data-id="' + id + '"]').find("td").eq(3).html(message);
 }
 
-function setStateView(id, state) {
+function setState(id, state) {
   $('#table1 tr[data-id="' + id + '"]').attr('state', state);
-  switch(state) {
-    case 'run':
-      updateStateView(id, 'В работе');
-      break;
-    case 'stop':
-      updateStateView(id, 'Останавливаем');
-      changeTrThemeView(id, 'table-warning');
-      break;
-    case 'stopped':
-      updateStateView(id, 'Остановлен');
-      changeTrThemeView(id, 'table-info');
-      break;
-    default:
-      updateStateView(id, 'Остановлен');
+}
+
+function getState(id) {
+  return $('#table1 tr[data-id="' + id + '"]').attr('state');
+}
+
+function changeTrThemeView(id, theme) {
+  $('#table1 tr[data-id="' + id + '"]').removeClass().addClass(theme);
+}
+
+function setStateView(id, state) {
+  if (state == 'run') {
+    if (getState(id) != 'stop') {
+      setState(id, state)
+      setStateMessage(id, 'В работе');
+    }
+  } else if (state == 'stop') {
+    if (getState(id) != 'stopped') {
+      setState(id, state);
+      setStateMessage(id, 'Останавливаем');
+    } 
+  } else if (state == 'stopped') {
+    setState(id, state);
+    setStateMessage(id, 'Остановлен');
   }
 }
 
@@ -152,20 +158,12 @@ function renderTaskCompletedView(user_id) {
   var currentValue = +getCompleteView(user_id);
   currentValue++;
   setCompleteView(user_id, currentValue);
-
-  // if (indicator == limit) {
-  //   updateTaskStatusDb(user_id, 'Активен');
-  //   updateStateView(user_id, 'Остановлен');
-  //   loggerDb(user_id, 'Работа завершена')
-  // }
 }
 
 function renderUserCompletedView (user_id, indicator, limit) {  //// FIX
   $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html( indicator + "/" + limit);
   if (indicator == limit) {
     updateUserStatusDb(user_id, 'Активен');
-    // userRowRenderView(user_id);
-    loggerDb(user_id, 'Работа завершена')
   }
 }
 
@@ -204,5 +202,4 @@ function renderUserRowView(users) {
   });
   $('#table1').append(usersHtml);
 }
-
 

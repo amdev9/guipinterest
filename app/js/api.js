@@ -16,8 +16,9 @@ function fullCreateAccount(session, cb) {
 
   var data1 = {
     'requests': '[' + JSON.stringify({
-    'method':'PUT',
-    'uri':'/v3/experiences/20006:30012/viewed/'}) + ']'
+                        'method':'PUT',
+                        'uri':'/v3/experiences/20006:30012/viewed/'
+                    }) + ']'
   };
   var data2 = {
     'requests': '[{"method":"GET","uri":"/v3/users/config/invitability/feature_weights/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/name_heuristics/","params":{"snapshot_key":"0"}},{"method":"GET","uri":"/v3/users/config/invitability/settings/","params":{"snapshot_key":"0"}}]'
@@ -25,7 +26,8 @@ function fullCreateAccount(session, cb) {
   var data3 = {
     'requests': "[" + JSON.stringify({
                        "method": "PUT",
-                       "uri"   : "/v3/experiences/20006:30012/completed/"}) + "]" 
+                       "uri"   : "/v3/experiences/20006:30012/completed/"
+                     }) + "]" 
   };
   var data4 = {
     'requests': '[{"method":"GET","uri":"/v3/experiences/","params":{"placement_ids":"20002"}}]' 
@@ -142,10 +144,10 @@ function fastCreateAccount(session, cb) {
 }
 
 function apiCreateAccounts(task) {
+  checkFolderExists(cookieDir);
   setStateView(task._id, 'run');
   loggerDb(task._id, 'Регистрация аккаунтов');
   setCompleteView(task._id, 0);
-  checkFolderExists(cookieDir);
   const NAMES = require('./config/names').names;
   const SURNAMES = require('./config/names').surnames;
   var Session = require('./pinterest-api/api/session');
@@ -208,17 +210,11 @@ function apiCreateAccounts(task) {
            
         });
       }, function(err, result) {
-        if(getStateView(task._id) == 'stop') {
-          console.log("-> остановлено");
-          setStateView(task._id, 'stopped');
-        }
-        // console.log("DONE!");
+        console.log("DONE!");
       });
 
       i++;
       if(getStateView(task._id) == 'stop' || i > email_tuple.length -1) {
-        console.log("-> останавливаем");
-        setStateView(task._id, 'stop');
         return resolver.resolve(); 
       }
       return Promise.cast(action(email_tuple))
@@ -238,6 +234,7 @@ function apiCreateAccounts(task) {
   };
   promiseWhile(actionFunc, chunked)
     .then(function() {
+      setStateView(task._id, 'stopped');
       loggerDb(task._id, 'Регистрация остановлена');  
     }).catch(function (err) {
       console.log(err);
@@ -245,7 +242,6 @@ function apiCreateAccounts(task) {
 }
 
 function apiSessionCheck(user_id, username, password) { // add proxy // ADD ERROR DESCRIBER
-  console.log(cookieDir);
   checkFolderExists(cookieDir);
   var filepath = cookieDir + user_id + ".json";
   createFile(filepath);

@@ -10,16 +10,17 @@ var Promise = require('bluebird');
 var readFilePromise = Promise.promisify(require("fs").readFile);
 var path = require('path');
 const os = require('os');
-var tmpdir = os.tmpdir();
 var config = require('./config/default');
-var dbname = config.App.dbname;
-var log = require('electron-log');
-
-var levelpath = path.join(tmpdir, dbname);
-var db = new PouchDB( levelpath , {adapter: 'leveldb'});
+var softname = config.App.softname;
+ 
+var levelPath = path.join(os.tmpdir(), softname, 'levdb');
+var logsDir = path.join(os.tmpdir(), softname, 'logs');
+checkFolderExists(levelPath);
+var db = new PouchDB(levelPath , {adapter: 'leveldb'});
 // PouchDB.debug.enable('*');
 PouchDB.debug.disable();
 // dropDb();
+
 
 function dropDb() {
   db.destroy().then(function (response) {
@@ -58,6 +59,7 @@ function getTaskDb(row_id, webcontents) {
 }
 
 function addUsersDb(users) {
+  
   users.forEach(function(userString, i, fullArr) {
     var userArr = userString.split('|');
     var usersObjArr = [];
@@ -235,7 +237,7 @@ function completeUserTaskDb(rows, taskName, params) {
 
 function checkAccountsDb(user_ids) {
   user_ids.forEach(function(user_id) {
-    updateStateView(user_id, 'В работе');
+
     db.get(user_id).then(function(user) {
       apiSessionCheck(user._id, user.username, user.password); // add proxy
     }).catch(function(err) {
@@ -244,23 +246,23 @@ function checkAccountsDb(user_ids) {
   });
 }
 
-function loggerDb(user_id, log_string) {
-  var d = new Date();
-  var datetext = d.toTimeString();
-  datetext = datetext.split(' ')[0];
+function loggerDb(user_id, logString) {
+  checkFolderExists(logsDir);
+  var dateTimeTxt = getTimeStamp();
   db.get(user_id).then(function(user) {
     if (user.username) {
-      var l_string = "[" + datetext + "] " + user.username + ": " + log_string;
+      var l_string = dateTimeTxt + user.username + ": " + logString;
     } else {
-      var l_string = "[" + datetext + "] " + user.name + ": " + log_string;
+      var l_string = dateTimeTxt + user.name + ": " + logString;
     }
-    var l_filepath = __dirname + "/logs/" +  user._id + ".txt";
+    var l_filepath = path.join(logsDir, user._id + ".txt");
     createFile(l_filepath);
     appendStringFile(l_filepath, l_string);
   }).catch(function (err) {
     console.log(err);
   });
 }
+
 
 function getUserDb(user_id, webcontents) {
   db.get(user_id).then(function(user) {
@@ -269,7 +271,6 @@ function getUserDb(user_id, webcontents) {
     console.log(err);
   });
 }
-
 
 function updateUserStatusDb(user_id, statusValue) {
   db.get(user_id).then(function(user) {

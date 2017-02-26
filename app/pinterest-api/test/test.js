@@ -2,33 +2,34 @@ var _ = require('lodash')
 var pin = require("../index")
 var should = require('should');
 var session;
+ 
 
 describe("Public endpoints", function() {
   it("should be possible to get #Gatekeeper.experiments", function(done) {
     pin.Gatekeeper.experiments()
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Gatekeeper.activate(smartlock)", function(done) {
      pin.Gatekeeper.activate('smartlock') 
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Gatekeeper.activate(ads_log_plain_mobile_advertiser_id)", function(done) {
      pin.Gatekeeper.activate('ads_log_plain_mobile_advertiser_id') 
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to check if email #Register.exists", function(done) {
     pin.Register.exists('blackkorol@gmail.com')
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
@@ -36,7 +37,8 @@ describe("Public endpoints", function() {
 
 describe("Session endpoints", function() {
   it("should be possible to create #Session through login", function (done) {
-    pin.Session.create('cookies.json', 'blackkorol@gmail.com', 'qweqwe123')
+
+    pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
     .then(function(sessionInstance) {
       session = sessionInstance;
       session.should.be.instanceOf(pin.Session);
@@ -51,49 +53,49 @@ describe("Session endpoints", function() {
   it("should be possible to get #Users.me from session", function(done) {
     pin.Users.me(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Users.meBoards from session", function(done) {
     pin.Users.meBoards(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Users.contactsSuggestions from session", function(done) {
     pin.Users.contactsSuggestions(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Experiences.get from session", function(done) {
     pin.Experiences.get(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Conversations.get from session", function(done) {
     pin.Conversations.get(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Notifications.get from session", function(done) {
     pin.Notifications.get(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Feeds.home from session", function(done) {
     pin.Feeds.home(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
@@ -119,7 +121,7 @@ describe("Session endpoints", function() {
     it("should be possible to get #Batch.post for data #" + i + " from session", function(done) {
       pin.Batch.post(session, data)
       .then(function(response) {
-        response.body.status.should.be.equal('success');
+        response.status.should.be.equal('success');
         done();
       })
     })
@@ -127,21 +129,21 @@ describe("Session endpoints", function() {
   it("should be possible to get #Orientation.signal from session", function(done) {
     pin.Orientation.signal(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Orientation.status from session", function(done) {
     pin.Orientation.status(session)
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
   it("should be possible to get #Interests.get from session", function(done) {
     pin.Interests.get(session, '684828755775988650')
     .then(function(response) {
-      response.body.status.should.be.equal('success');
+      response.status.should.be.equal('success');
       done();
     })
   });
