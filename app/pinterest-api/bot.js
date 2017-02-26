@@ -23,7 +23,6 @@ console.log(name, email, password)
 
   
  
- 
 
 
 

@@ -4,11 +4,8 @@ var Resource = require('./resource');
 var Request = require('./request');
 var request = require('request-promise');
  
-
-
 function Session(storage) {
   this.setCookiesStorage(storage);
-
 }
 
 util.inherits(Session, Resource);
@@ -89,7 +86,7 @@ Session.login = function(session, email, password) {
       throw error;
     })
     .then(function(res) {
-      var access_token = res.body.data.access_token;
+      var access_token = res.data.access_token;
       session.setAuthorization(access_token);
       return session;
     })

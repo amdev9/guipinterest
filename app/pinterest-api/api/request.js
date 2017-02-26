@@ -158,33 +158,6 @@ Request.prototype.beforeParse = function (response, request, attemps) {
     return response;
 }
 
-Request.prototype.send = function(options, attemps) {
-  var that = this;
-  if (!attemps) attemps = 0;
-  return this._mergeOptions(options)
-    .then(function(opts) {
-      return [opts, that._prepareData()];    
-    })
-    .spread(function(opts, data){
-      opts = _.defaults(opts, data);
-      return that._transform(opts);
-    })
-    .then(function(opts) { 
-      options = opts;
-      return [Request.requestClient(options), options, attemps]
-    })
-    .spread(_.bind(this.beforeParse, this))
-    .then(_.bind(this.parseMiddleware, this))
-    .then(function (response) {
-      
-      return response.body;
-      
-    })
-    .catch(function(error) {
-      console.log(error);
-    })
-}
-
 Request.prototype._initialize = function() {
   // Easier for inheritence
 };
@@ -227,3 +200,31 @@ Request.prototype.parseMiddleware = function (response) {
   response.body = JSON.parse(response.body);
   return response;
 };
+
+Request.prototype.send = function(options, attemps) {
+  var that = this;
+  if (!attemps) attemps = 0;
+  return this._mergeOptions(options)
+    .then(function(opts) {
+      return [opts, that._prepareData()];    
+    })
+    .spread(function(opts, data){
+      opts = _.defaults(opts, data);
+      return that._transform(opts);
+    })
+    .then(function(opts) { 
+      options = opts;
+      return [Request.requestClient(options), options, attemps]
+    })
+    .spread(_.bind(this.beforeParse, this))
+    .then(_.bind(this.parseMiddleware, this))
+    .then(function (response) {
+      
+      return response.body;
+      
+    })
+    .catch(function(error) {
+      console.log(error);
+    })
+}
+

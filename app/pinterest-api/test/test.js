@@ -39,13 +39,14 @@ describe("Session endpoints", function() {
   it("should be possible to create #Session through login", function (done) {
 
     pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
-    .then(function(sessionInstance) {
-      session = sessionInstance;
-      session.should.be.instanceOf(pin.Session);
-      module.exports.session = session;
-      done();
-    })
+      .then(function(sessionInstance) {
+        session = sessionInstance;
+        session.should.be.instanceOf(pin.Session);
+        module.exports.session = session;
+        done();
+      })
   });
+  
   it("should be possible to get auth_token from session", function(done) {
     session.Authorization.should.be.a.String();
     done();
