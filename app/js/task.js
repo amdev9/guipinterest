@@ -156,7 +156,6 @@ function createAccounts(taskName) {
 }
  
 function completeTask(taskName) {
-
   if (taskName == 'parse_concurrents') {
     parseConcurrents(taskName);
   } else if (taskName == 'filtration') {

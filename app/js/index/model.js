@@ -46,18 +46,6 @@ function addTaskDb(task) {
   }
 }
 
-function getTaskDb(row_id, webcontents) {
-  db.get(row_id).then(function(item) {
-    if (item.type == 'task') {
-      webcontents.send('edit', item);
-    } else {
-      webcontents.send('edit', item.task);
-    }
-  }).catch(function (err) {
-    console.log(err);
-  });
-}
-
 function addUsersDb(users) {
   
   users.forEach(function(userString, i, fullArr) {
@@ -125,111 +113,15 @@ function getExistedUserRows(rows) {
     });
   })
 }
-
-function parseConcurrentsUserDb(result) {
-  var users = result;
-  var to_parse_usernames = params[1].length;
-  var div = Math.floor(to_parse_usernames / users.length);
-  var rem = to_parse_usernames % users.length;
-  var dotation = [];
-  dotation[0] = rem + div;
-  for (var i = 1; i < users.length; i++) {
-    dotation[i] = dotation[i-1]+div;
-  }
-  users.forEach( function(user, i , arr) {
-    let db_object = {
-      _id: user._id,
-      username: user.username, 
-      proxy: user.proxy,
-      password: user.password,
-      status: user.status,
-      type: user.type,
-      cookie: user.cookie,
-      task: {
-        name: taskName,
-        outputfile: params[0], 
-        parsed_conc: (i == 0) ? params[1].slice(0, dotation[i]) : params[1].slice(dotation[i-1], dotation[i]),
-        max_limit: params[2], 
-        parse_type: params[3]
-      },
-      _rev: user._rev 
-    };
-    return db.put(db_object).then(function (result) {
-      setTaskView(user._id, taskName);
-    }).catch(function (err) {
-      console.log(err);
-    });
-  });
-}
-
-function filtrationUserDb(result) {
-  var users = result;
-  var concurParsed = [];
-  readFile(params[0], function (data) {
-    concurParsed = data.split('\n');
-    concurParsed = concurParsed.filter(isEmpty);
-
-    var to_parse_usernames = concurParsed.length;
-    var div = Math.floor(to_parse_usernames / users.length);
-    var rem = to_parse_usernames % users.length;
-    var dotation = [];
-    dotation[0] = rem + div;
-    for (var i = 1; i < users.length; i++) {
-      dotation[i] = dotation[i-1]+div;
-    }
-    
-    users.forEach( function(user, i , arr) {
-      let db_object = {
-        _id: user._id,
-        username: user.username, 
-        proxy: user.proxy,
-        password: user.password,
-        status: user.status,
-        type: user.type,
-        cookie: user.cookie,
-        task: {
-          name: taskName,
-          inputfile: params[0],
-          input_array: (i == 0) ? concurParsed.slice(0, dotation[i]) : concurParsed.slice(dotation[i-1], dotation[i]), // params[0],  
-          followers: {
-            from: params[1],
-            to: params[2]
-          },
-          subscribers: {
-            from: params[3], 
-            to: params[4]
-          },
-          publications: {
-            from: params[5],
-            to: params[6]
-          },
-          stop_words_file: params[7],
-          anonym_profile: params[8],
-          private: params[9],
-          lastdate: params[10],
-          outputfile: params[11]
-        },
-        _rev: user._rev
-      };
-      return db.put(db_object).then(function (result) {
-        setTaskView(user._id, taskName);
-      }).catch(function (err) {
-        console.log(err);
-      });
-    });
-  });
-}
-
+ 
 function completeUserTaskDb(rows, taskName, params) {
   getExistedUserRows(rows)
     .then(function(result) {
-
-    if (taskName == 'parse_concurrents') {
-      parseConcurrentsUserDb(result);
-    } else if (taskName == 'filtration') {
-      filtrationUserDb(result);
-    }
-
+      // if (taskName == 'parse_concurrents') {
+      //   parseConcurrentsUserDb(result);
+      // } else if (taskName == 'filtration') {
+      //   filtrationUserDb(result);
+      // }
   }).catch(function(err) {
     console.log(err);
   });
@@ -263,10 +155,9 @@ function loggerDb(user_id, logString) {
   });
 }
 
-
-function getUserDb(user_id, webcontents) {
-  db.get(user_id).then(function(user) {
-    webcontents.send('edit', user);
+function getItemDb(row_id, webcontents) {
+  db.get(row_id).then(function(item) {
+    webcontents.send('edit', item);
   }).catch(function (err) {
     console.log(err);
   });
