@@ -162,7 +162,7 @@ function parseConcurrentsUserDb(result) {
   });
 }
 
-function filtrationUserDb() {
+function filtrationUserDb(result) {
   var users = result;
   var concurParsed = [];
   readFile(params[0], function (data) {

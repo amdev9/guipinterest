@@ -11,8 +11,29 @@ const {dialog} = require('electron').remote;
 var config = require('./config/default');
 const devIsOpen = config.App.devTools;
 var softname = config.App.softname;
+const ipc = require('electron').ipcRenderer;
 
 var logsDir = path.join(os.tmpdir(), softname, 'logs');
+
+ipc.on('add', (event, users) => {
+  addUsersDb(users);
+});
+
+ipc.on('edit', (event, user) => {
+  editUserDb(user);
+});
+
+ipc.on('sync_db', (event) => {
+  initViewDb();
+});
+
+ipc.on('task_complete', (event, rows, taskName, params ) => {
+  completeUserTaskDb(rows, taskName, params);
+});
+
+ipc.on('add_task', (event, task ) => {
+  addTaskDb(task);
+});
 
 function checkSecurityController(cb) {
   checkLicense(cb);

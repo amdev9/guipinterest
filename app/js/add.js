@@ -23,7 +23,7 @@ function isEmpty(x) {
 
 var openFile = function(selector) {
   const {dialog} = require('electron').remote
-  var path = dialog.showOpenDialog({properties: ['openFile']}); // , 'openDirectory'
+  var path = dialog.showOpenDialog({properties: ['openFile']});
   if (path) {
     document.getElementById(selector).value = path;
   }
