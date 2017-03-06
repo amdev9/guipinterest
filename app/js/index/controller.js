@@ -28,7 +28,6 @@ ipc.on('sync_db', (event) => {
 });
 
 ipc.on('task_complete', (event, rows, taskName, params ) => {
-  console.log(rows);
   completeUserTaskDb(rows, taskName, params);
 });
 

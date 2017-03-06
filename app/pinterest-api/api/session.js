@@ -81,7 +81,7 @@ Session.login = function(session, email, password) {
       "username_or_email": email
     })
     .setResourceSigned('login')
-    .send()
+    .send() 
     .catch(function(error) {
       throw error;
     })
@@ -95,8 +95,8 @@ Session.login = function(session, email, password) {
     })
 }
 
-Session.create = function(storage, email, password) {
+Session.create = function(storage, email, password) { 
   var that = this;
   var session = new Session(storage);
-  return Session.login(session, email, password);
+  return Session.login(session, email, password); 
 }

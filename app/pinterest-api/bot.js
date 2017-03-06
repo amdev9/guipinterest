@@ -2,7 +2,7 @@ var _ = require('lodash')
 var pin = require("./index")
 
 var Session = require('./api/session')
- 
+var Request = require('./api/request');
 var storage = 'cookie.json'
 var session = new Session(storage);
 
@@ -10,21 +10,15 @@ function generatePassword() {
   return Math.random().toString(36).slice(-8).toUpperCase();
 }
 
-const NAMES = require('../app/config/names').names;
-const SURNAMES = require('../app/config/names').surnames;
+// const NAMES = require('../app/config/names').names;
+// const SURNAMES = require('../app/config/names').surnames;
 
 
-var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
-var email = name + 'llman@mailglobals.co';
-var password = generatePassword();
+// var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
+// var email = name + 'llman@mailglobals.co';
+// var password = generatePassword();
 
-console.log(name, email, password)
-
-
-  
- 
-
-
+// console.log(name, email, password)
 
 // var storage = 'cookie.json'
 // var session = new Session(storage);
@@ -33,13 +27,24 @@ console.log(name, email, password)
 //   console.log(res);
 // })
 
-// pin.Session.create('cookies.json', 'blackkorol@gmail.com', 'qweqwe123')
-// .then(function (session) {
-//   return session;
-// })
-// .then(function (session) {
-//   return [session, pin.Categories.get(session)];
-// })
+ 
+ pin.Request.setProxy(`http://1.1.1.1:3333`); 
+
+ pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
+.then(function (session) { // pass token
+  
+  // console.log(session)
+  return session;
+})
+.then(function (session) {
+  return pin.Categories.get(session);
+})
+.then(function (session) {
+  console.log(session);
+})
+
+ 
+
 // .spread(function(session, res) {
 //   // console.log(res.body);  
 //   return [session, pin.Interests.get (session, 'womens_fashion')]; 

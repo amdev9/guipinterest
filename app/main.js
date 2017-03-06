@@ -25,9 +25,9 @@ ipc.on('user_edit', (event, user) => {
   mainWindow.webContents.send('edit', user);
 });
 
-ipc.on('task_complete_event', (event, rows, taskName, ...params) => {
-  mainWindow.webContents.send('task_complete', rows, taskName, params);
-});
+// ipc.on('task_complete_event', (event, rows, taskName, ...params) => {
+//   mainWindow.webContents.send('task_complete', rows, taskName, params);
+// });
 
 ipc.on('add_task_event', (event, task) => {
   mainWindow.webContents.send('add_task', task);

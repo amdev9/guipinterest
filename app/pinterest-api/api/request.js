@@ -201,7 +201,9 @@ Request.prototype.parseMiddleware = function (response) {
   return response;
 };
 
+
 Request.prototype.send = function(options, attemps) {
+  
   var that = this;
   if (!attemps) attemps = 0;
   return this._mergeOptions(options)
@@ -213,15 +215,16 @@ Request.prototype.send = function(options, attemps) {
       return that._transform(opts);
     })
     .then(function(opts) { 
-      options = opts;
-      return [Request.requestClient(options), options, attemps]
+      options = opts
+      var req = Request.requestClient(options) // should return promise with events
+                                              // make stop from session
+      // req.abort()
+      return [req, options, attemps]
     })
     .spread(_.bind(this.beforeParse, this))
     .then(_.bind(this.parseMiddleware, this))
     .then(function (response) {
-      
       return response.body;
-      
     })
     .catch(function(error) {
       console.log(error);

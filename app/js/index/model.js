@@ -47,7 +47,6 @@ function addTaskDb(task) {
 }
 
 function addUsersDb(users) {
-  
   users.forEach(function(userString, i, fullArr) {
     var userArr = userString.split('|');
     var usersObjArr = [];
