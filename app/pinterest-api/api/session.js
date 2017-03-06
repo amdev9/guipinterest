@@ -4,77 +4,63 @@ var Resource = require('./resource');
 var Request = require('./request');
 var request = require('request-promise');
  
-function Session(storage) {
-  this.setCookiesStorage(storage);
-}
+class Session {
+  constructor(storage) {
+    this.setCookiesStorage(storage);
+  }
 
-util.inherits(Session, Resource);
-module.exports = Session;
+  get jar() { return this._jar }
+  set jar(val) {}
 
-Object.defineProperty(Session.prototype, "jar", {
-  get: function() { return this._jar },
-  set: function(val) {}
-});
+  get id() { return this._id }
+  set id(val) {}
 
-Object.defineProperty(Session.prototype, "id", {
-  get: function() { return this._id },
-  set: function(val) {}
-});
-
-Object.defineProperty(Session.prototype, "name", {
-  get: function() { return this._name },
-  set: function(val) {}
-});
-
-Object.defineProperty(Session.prototype, "email", {
-  get: function() { return this._email },
-  set: function(val) {}
-});
-
-Object.defineProperty(Session.prototype, "password", {
-  get: function() { return this._password },
-  set: function(val) {}
-});
-
-Object.defineProperty(Session.prototype, "Authorization", {
-  get: function() {   
+  get name() { return this._name }
+  set name(val) {}
+ 
+  get email() { return this._email }
+  set email(val) {}
+  
+  get password() { return this._password }
+  set password(val) {}
+ 
+  get Authorization() {   
     return this._Authorization;
-  },
-  set: function(val) {}
-});
+  }
+  set Authorization(val) {}
+ 
+  setName(name) {
+    this._name = name;
+    return this;
+  }
 
-Session.prototype.setName = function(name) {
-  this._name = name;
-  return this;
-};
+  setPassword(password) {
+    this._password = password;
+    return this;
+  };
 
-Session.prototype.setPassword = function(password) {
-  this._password = password;
-  return this;
-};
+  setEmail(email) {
+    this._email = email;
+    return this;
+  };
 
-Session.prototype.setEmail = function(email) {
-  this._email = email;
-  return this;
-};
+  setUserId(id) {
+    this._id = id;
+    return this;
+  };
+  
+  setCookiesStorage(storage) {
+    this._jar = request.jar(new FileCookieStore(storage)); 
+    return this;
+  };
 
-Session.prototype.setUserId = function(id) {
-  this._id = id;
-  return this;
-};
+  setAuthorization(token) {
+    this._Authorization = token;
+    return this;
+  };
 
-Session.prototype.setCookiesStorage = function(storage) {
-  this._jar = request.jar(new FileCookieStore(storage)); 
-  return this;
-};
-
-Session.prototype.setAuthorization = function(token) {
-  this._Authorization = token;
-  return this;
-};
-
-Session.login = function(session, email, password) {
-  return new Request(session) 
+  static login(session, email, password) {
+    return new Request(session) 
     .setMethod('POST')
     .setData({
       "password": password,
@@ -93,10 +79,16 @@ Session.login = function(session, email, password) {
     .catch(function(error) {
       console.log(error);
     })
+  }
+
+  static create(storage, email, password) { 
+    var that = this;
+    var session = new Session(storage);
+    return Session.login(session, email, password); 
+  }
 }
 
-Session.create = function(storage, email, password) { 
-  var that = this;
-  var session = new Session(storage);
-  return Session.login(session, email, password); 
-}
+module.exports = Session;
+
+
+

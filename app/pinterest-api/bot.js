@@ -10,9 +10,24 @@ function generatePassword() {
   return Math.random().toString(36).slice(-8).toUpperCase();
 }
 
+// pin.Request.setProxy(`http://1.1.1.1:3333`); 
+pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
+.then(function (session) {
+  return session;
+})
+.then(function (session) {
+  return pin.Categories.get(session);
+})
+.then(function (session) {
+  console.log(session);
+})
+
+
+
+
+
 // const NAMES = require('../app/config/names').names;
 // const SURNAMES = require('../app/config/names').surnames;
-
 
 // var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
 // var email = name + 'llman@mailglobals.co';
@@ -26,24 +41,6 @@ function generatePassword() {
 // .then(function(res) {
 //   console.log(res);
 // })
-
- 
- pin.Request.setProxy(`http://1.1.1.1:3333`); 
-
- pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
-.then(function (session) { // pass token
-  
-  // console.log(session)
-  return session;
-})
-.then(function (session) {
-  return pin.Categories.get(session);
-})
-.then(function (session) {
-  console.log(session);
-})
-
- 
 
 // .spread(function(session, res) {
 //   // console.log(res.body);  
@@ -75,8 +72,6 @@ function generatePassword() {
 //   // var data5 = {
 //   //   'requests': "[" + jsondata + "]"
 //   // };
-
- 
 // })
  
 
