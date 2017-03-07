@@ -60,6 +60,7 @@ class Session {
   };
 
   static login(session, email, password) {
+    
     return new Request(session) 
     .setMethod('POST')
     .setData({
@@ -67,7 +68,7 @@ class Session {
       "username_or_email": email
     })
     .setResourceSigned('login')
-    .send() 
+    .send()
     .catch(function(error) {
       throw error;
     })

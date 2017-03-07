@@ -1,6 +1,8 @@
 var _ = require('lodash');
 var Promise = require('bluebird');
 var request = require('request-promise');
+var concat = require('concat-stream')
+
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -17,7 +19,17 @@ class Request {
     this._request.options = {
       gzip: true 
     };
-    this._request.headers = Request.defaultHeaders;
+    this._request.headers = {
+      'Connection': 'Keep-Alive',
+      'X-Pinterest-AppState': 'background',
+      'Accept-Language': 'en_US',
+      'Authorization': '', 
+      'X-Pinterest-App-Type': 3,
+      'X-Pinterest-InstallId': Helpers.generateInstallId(),
+      'X-Pinterest-Device-Class': Constants.CLIENT.DEVICE_CLASS,
+      'X-Pinterest-Device-HardwareId': Helpers.generateDeviceId(), 
+      'X-Pinterest-Device': Constants.CLIENT.DEVICE
+    };
     this.attemps = 2;
     if(session) {
       this.session = session;         
@@ -26,11 +38,16 @@ class Request {
     this._transform = function(t) { return t };
   }
 
+  static setStopToken(token) {
+    Request.token = token;
+  }
+
   static setProxy(proxyUrl) {
     if(!Helpers.isValidUrl(proxyUrl))
       throw new Error("`proxyUrl` argument is not an valid url")
     var object = { 'proxy': proxyUrl };    
     Request.requestClient = request.defaults(object);
+    console.log("SETPROXY")
   }
 
   static setSocks5Proxy(host, port) {
@@ -176,13 +193,15 @@ class Request {
   }
 
   parseMiddleware(response) {
-    response.body = JSON.parse(response.body);
+    response = JSON.parse(response);
     return response;
   }
 
   send(options, attemps) {
     var that = this;
     if (!attemps) attemps = 0;
+
+    
     return this._mergeOptions(options)
       .then(function(opts) {
         return [opts, that._prepareData()];    
@@ -193,15 +212,36 @@ class Request {
       })
       .then(function(opts) { 
         options = opts
-        var req = Request.requestClient(options) // should return promise with events
-                                                // make stop from session
-        // req.abort()
-        return [req, options, attemps]
+
+        return new Promise(function(resolve, reject) {
+          var xhr = Request.requestClient(options)
+          var body = concat(function(data) {
+
+            resolve([data.toString(), options, attemps]);
+
+          })
+
+          xhr.on('data', function(chunk) {
+            body.write(chunk);
+          }).on('end', function() {
+            body.end()
+          });
+
+           
+          if (Request.token) {          
+            Request.token.cancel = function() { 
+              xhr.abort();
+              reject(new Error("Cancelled"));
+            };
+          }
+        });
+
+        // return [Request.requestClient(options), options, attemps]
       })
       .spread(_.bind(this.beforeParse, this))
       .then(_.bind(this.parseMiddleware, this))
       .then(function (response) {
-        return response.body;
+        return response //.body;
       })
       .catch(function(error) {
         console.log(error);
@@ -215,18 +255,6 @@ var Constants = require('./constants');
 var Helpers = require('../helpers');
 var routes = require('./routes');
 var Session = require('./session');
-
-Request.defaultHeaders = {
-  'Connection': 'Keep-Alive',
-  'X-Pinterest-AppState': 'background',
-  'Accept-Language': 'en_US',
-  'Authorization': '', 
-  'X-Pinterest-App-Type': 3,
-  'X-Pinterest-InstallId': Helpers.generateInstallId(),
-  'X-Pinterest-Device-Class': Constants.CLIENT.DEVICE_CLASS,
-  'X-Pinterest-Device-HardwareId': Helpers.generateDeviceId(), 
-  'X-Pinterest-Device': Constants.CLIENT.DEVICE
-};
 
 Request.requestClient = request.defaults({});
 
