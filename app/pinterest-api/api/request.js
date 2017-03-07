@@ -193,8 +193,8 @@ class Request {
   }
 
   parseMiddleware(response) {
-    response = JSON.parse(response);
-    return response;
+    response.body = JSON.parse(response.body);
+    return response.body;
   }
 
   send(options, attemps) {
@@ -215,19 +215,21 @@ class Request {
 
         return new Promise(function(resolve, reject) {
           var xhr = Request.requestClient(options)
+
+          var res;
           var body = concat(function(data) {
-
-            resolve([data.toString(), options, attemps]);
-
+            res.body = data.toString();
+            resolve([res, options, attemps]);
           })
 
-          xhr.on('data', function(chunk) {
+          xhr.on('response', function(response) {
+            res = response;
+          }).on('data', function(chunk) {
             body.write(chunk);
           }).on('end', function() {
             body.end()
           });
 
-           
           if (Request.token) {          
             Request.token.cancel = function() { 
               xhr.abort();
