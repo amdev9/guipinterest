@@ -47,7 +47,7 @@ class Request {
       throw new Error("`proxyUrl` argument is not an valid url")
     var object = { 'proxy': proxyUrl };    
     Request.requestClient = request.defaults(object);
-    console.log("SETPROXY")
+     
   }
 
   static setSocks5Proxy(host, port) {
@@ -194,7 +194,7 @@ class Request {
 
   parseMiddleware(response) {
     response.body = JSON.parse(response.body);
-    return response.body;
+    return response;
   }
 
   send(options, attemps) {
@@ -243,7 +243,7 @@ class Request {
       .spread(_.bind(this.beforeParse, this))
       .then(_.bind(this.parseMiddleware, this))
       .then(function (response) {
-        return response //.body;
+        return response.body;
       })
       .catch(function(error) {
         console.log(error);

@@ -5,23 +5,28 @@
 'use strict';
 
 window.$ = window.jQuery = require('jquery');
+var config = require('./config/default');
+var softname = config.App.softname;
 
 $(document).ready(function () {
+  $('#navbarBrand').text(softname)
   $('#memberModal').modal({backdrop: 'static', keyboard: false});
-  checkSecurityController(function(result) {
-    if(result == 'ok') {
-      $('#memberModal').modal('hide');
-    } else if (result == 'fail') {
-      $("#memberModalBody > p").text("Проверьте подключение к интернету и наличие лицензии") 
-      console.log(result);
-    } else if (result == 'vm') {
-      $("#memberModalBody > p").text("Виртуальные машины не поддерживаются") 
-    } else {
-      $("#memberModalBody > p").text("Произошла ошибка") 
-    }
-  });
+  $('#memberLicense').html(`<small>Спасибо за использование ${softname}</small>`)
+  checkSecurityController(setModalStatus);
 });
  
+function setModalStatus(result) {
+  if(result == 'ok') {
+    $('#memberModal').modal('hide');
+  } else if (result == 'fail') {
+    $("#memberModalBody").text("Проверьте подключение к интернету и наличие лицензии")
+  } else if (result == 'vm') {
+    $("#memberModalBody").text("Виртуальные машины не поддерживаются") 
+  } else {
+    $("#memberModalBody").text("Ошибка проверки лицензии") 
+  }
+}
+
 function showLicenseTokenView(token) {
   $("#memberLicense > p").text("Лицензионный ключ: " + token + "")
 }
@@ -46,8 +51,9 @@ function setProxyView(id, proxy) {
   $('#table1 tr[data-id="' + id + '"]').find("td").eq(1).html(proxy);
 }
 
-function setTaskView(id, taskType) {
-  $('#table1 tr[data-id="' + id + '"]').find("td").eq(2).html(taskType);
+function setTaskView(id, taskName) {
+  var taskName = taskRenderNames(taskName);
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(2).html(taskName);
 }
 
 function setStateMessage(id, message) {
@@ -83,6 +89,15 @@ function setStateView(id, state) {
   }
 }
 
+function taskRenderNames(taskDbName) {
+  switch(taskDbName) {
+    case 'filtration': return 'Фильтрация'
+    case 'parse_concurrents': return 'Парсинг по конкурентам'
+    case 'create_accounts': return 'Регистрация аккаунтов'
+    default: return '-'
+  }
+}
+
 function getStateView(id) {
   return $('#table1 tr[data-id="' + id +'"]').attr('state');
 }
@@ -100,6 +115,7 @@ function setStatusView(id, status) {
 }
 
 function addStopStateView(rows_ids) {
+  tokenCancel();
   rows_ids.forEach( function(user_id) {
     var state = getStateView(user_id);
     if (state != 'stopped') {
@@ -108,34 +124,10 @@ function addStopStateView(rows_ids) {
   })
 }
 
-function initTaskRowRenderView(tasks) {
-  var tasksHtml = "";
-  tasks.forEach(function(task) { // class="task"??
-    var oneTaskHtml = `<tr data-id="${task.doc._id}" state="stopped" type="task">
-      <td>-</td>
-      <td>-</td>
-      <td>${ task.doc.name }</td>
-      <td>Остановлен</td>
-      <td>-</td>
-      <td>${task.doc.status}</td></tr>`;
-    tasksHtml += oneTaskHtml;
+function deleteRowsView(rows) {
+  rows.forEach(function(row_id) {
+    $('#table1 tr[data-id="' + row_id + '"]').remove();
   });
-  $('#table1').append(tasksHtml);
-}
-
-function initUserRowRenderView(users) {
-  var usersHtml = "";
-  users.forEach(function(user) {
-    var oneUserHtml = `<tr data-id="${user.doc._id}" state="stopped">
-      <td>${user.doc.username}</td>
-      <td>${ user.doc.proxy != '' ? user.doc.proxy : "-" }</td>
-      <td>${ user.doc.task != '-' ? user.doc.task.name : "-"}</td>
-      <td>Остановлен</td>
-      <td>-</td>
-      <td>${user.doc.status}</td></tr>`;
-    usersHtml += oneUserHtml;
-  });
-  $('#table1').append(usersHtml);
 }
 
 function userRowRenderView(user_id) {
@@ -147,11 +139,13 @@ function userRowRenderView(user_id) {
       setProxyView(user._id, "-");
     }
     setStatusView(user._id, user.status);    
-  }).then(function() {
-    setStateView(user_id, 'stopped');
   }).catch(function (err) {
     console.log(err);
   });
+}
+
+function renderNewTaskCompletedView(user_id) {
+  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html(0);
 }
 
 function renderTaskCompletedView(user_id) {
@@ -160,38 +154,42 @@ function renderTaskCompletedView(user_id) {
   setCompleteView(user_id, currentValue);
 }
 
-function renderUserCompletedView (user_id, indicator, limit) {  //// FIX
-  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html( indicator + "/" + limit);
-  if (indicator == limit) {
-    updateUserStatusDb(user_id, 'Активен');
-  }
-}
-
-function renderNewTaskCompletedView(user_id) {
-  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html(0);
-}
-
-function deleteRowsView(rows) {
-  rows.forEach(function(row_id) {
-    $('#table1 tr[data-id="' + row_id + '"]').remove();
-  });
+function renderUserCompletedView(user_id, limit, indicator, filterSuccess) {
+  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html(limit + "/" + indicator + "/" + filterSuccess);
 }
 
 function renderTaskRowView(task_id, taskName) { 
-  var taskHtml = `<tr class="task" data-id="${task_id}" state="stopped" type="task">
+  var taskName = taskRenderNames(taskName);
+  var taskHtml = `<tr data-id="${task_id}" state="stopped" type="task">
     <td>-</td>
     <td>-</td>
     <td>${taskName}</td>
     <td>Остановлен</td>
     <td>-</td>
     <td>-</td></tr>`;
-  $('#table1').append(taskHtml);
+  $(taskHtml).prependTo('#table1');
+}
+
+function initTaskRowRenderView(tasks) {
+  var tasksHtml = "";
+  tasks.forEach(function(task) { // class="task"??
+    var taskName = taskRenderNames(task.doc.name);
+    var oneTaskHtml = `<tr data-id="${task.doc._id}" state="stopped" type="task">
+      <td>-</td>
+      <td>-</td>
+      <td>${taskName}</td>
+      <td>Остановлен</td>
+      <td>-</td>
+      <td>${task.doc.status}</td></tr>`;
+    tasksHtml += oneTaskHtml;
+  });
+  $('#table1').append(tasksHtml);
 }
 
 function renderUserRowView(users) {
   var usersHtml = "";
   users.forEach(function(user) {
-    var oneUserHtml = `<tr class="task" data-id="${user.username}" state="stopped">
+    var oneUserHtml = `<tr data-id="${user.username}" state="stopped" class="table-sm">
       <td>${user.username}</td>
       <td>${ user.proxy != '' ? user.proxy : '-'}</td>
       <td>-</td>
@@ -203,3 +201,18 @@ function renderUserRowView(users) {
   $('#table1').append(usersHtml);
 }
 
+function initUserRowRenderView(users) {
+  var usersHtml = "";
+  users.forEach(function(user) {
+    var taskName = taskRenderNames(user.doc.task.name);
+    var oneUserHtml = `<tr data-id="${user.doc._id}" state="stopped" class="table-sm">
+      <td>${user.doc.username}</td>
+      <td>${ user.doc.proxy != '' ? user.doc.proxy : "-" }</td>
+      <td>${taskName}</td>
+      <td>Остановлен</td>
+      <td>-</td>
+      <td>${user.doc.status}</td></tr>`;
+    usersHtml += oneUserHtml;
+  });
+  $('#table1').append(usersHtml);
+}

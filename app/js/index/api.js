@@ -6,11 +6,15 @@
 
 var Client = require('./pinterest-api'); 
 var fs = require('fs');
+var path = require('path')
 var Promise = require('bluebird');
-var cookieDir = os.tmpdir() + '/cookie/';
 var async = require('async');
-var _ = require('lodash');
 var config = require('./config/default');
+var softname = config.App.softname;
+var _ = require('lodash');
+
+var cookieDir = path.join(os.tmpdir(), softname, 'cookie');
+
 
 function fullCreateAccount(session, cb) {
 
@@ -144,7 +148,9 @@ function fastCreateAccount(session, cb) {
 }
 
 function apiCreateAccounts(task) {
-  checkFolderExists(cookieDir);
+  mkdirFolder(logsDir)
+  .then(function() {
+  
   setStateView(task._id, 'run');
   loggerDb(task._id, 'Регистрация аккаунтов');
   setCompleteView(task._id, 0);
@@ -239,22 +245,27 @@ function apiCreateAccounts(task) {
     }).catch(function (err) {
       console.log(err);
     });
+  })
 }
 
+
 function apiSessionCheck(user_id, username, password) { // add proxy // ADD ERROR DESCRIBER
-  checkFolderExists(cookieDir);
-  var filepath = cookieDir + user_id + ".json";
-  createFile(filepath);
-  Client.Session.create(filepath, username, password) // check for created file
-    .then(function (session) {
-      updateUserStatusDb(user_id, 'Активен');
-    }).catch(function (err) {
-      if (err instanceof Client.Exceptions.APIError) {
-        updateUserStatusDb(user_id, err.name);
-        console.log(err);
-      } else {
-        updateUserStatusDb(user_id, 'Произошла ошибка');
-        console.log(err);
-      }
-    });
+ mkdirFolder(cookieDir)
+  .then(function() {
+
+    var filepath = cookieDir + user_id + ".json";
+    createFile(filepath);
+    Client.Session.create(filepath, username, password) // check for created file
+      .then(function (session) {
+        updateUserStatusDb(user_id, 'Активен');
+      }).catch(function (err) {
+        if (err instanceof Client.Exceptions.APIError) {
+          updateUserStatusDb(user_id, err.name);
+          console.log(err);
+        } else {
+          updateUserStatusDb(user_id, 'Произошла ошибка');
+          console.log(err);
+        }
+      });
+  })
 }

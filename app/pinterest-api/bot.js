@@ -15,30 +15,30 @@ var token = {};
 pin.Request.setStopToken(token);
 var promise = pin.Gatekeeper.experiments()
 .then(function(res) {
-  // console.log(res)
   return pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
 })
 .then(function(session) {
+  console.log(session)
   return session;
 })
-.then(function(session) {
+// .then(function(session) {
  
-  return [session, pin.Interests.get (session, 'womens_fashion')]; 
-})
-.spread(function(session, res) {
-  console.log(res);  
-  return [session, pin.Interests.get(session, 'womens_fashion')]; 
-})
-.catch(function(err) {
-    console.log(err.message);
-})
+//   return [session, pin.Interests.get (session, 'womens_fashion')]; 
+// })
+// .spread(function(session, res) {
+//   console.log(res);  
+//   return [session, pin.Interests.get(session, 'womens_fashion')]; 
+// })
+// .catch(function(err) {
+//     console.log(err.message);
+// })
 
-setTimeout(function() {
-  if (typeof token.cancel === "function") { 
-    token.cancel()
-  }
-}, 15)
+// setTimeout(function() {
+//   if (typeof token.cancel === "function") { 
+//     token.cancel()
+//   }
+// }, 65)
 
-  
+
 
 

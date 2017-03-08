@@ -4,36 +4,56 @@
 
 'use strict';
 
-var path = require('path');
-const url = require('url');
-const BrowserWindow = require('electron').remote.BrowserWindow;
-const {dialog} = require('electron').remote;
-var config = require('./config/default');
-const devIsOpen = config.App.devTools;
-var softname = config.App.softname;
-const ipc = require('electron').ipcRenderer;
+var path = require('path')
+const url = require('url')
+var _ = require('lodash')
+const {dialog, BrowserWindow} = require('electron').remote
+const ipcRenderer = require('electron').ipcRenderer
 
-var logsDir = path.join(os.tmpdir(), softname, 'logs');
+var config = require('./config/default')
+const devIsOpen = config.App.devTools
+var softname = config.App.softname
+var logsDir = path.join(os.tmpdir(), softname, 'logs')
 
-ipc.on('add', (event, users) => {
+
+document.title = softname
+
+var logControls = [];
+
+// Display the current version
+let version = window.location.hash.substring(1);
+// document.getElementById('version').innerText = version;
+document.title = softname + " " + version
+
+ipcRenderer.on('message', function(event, text) {
+  var container = document.getElementById('messages');
+  var message = document.createElement('div');
+  message.innerHTML = text;
+  container.appendChild(message);
+})
+
+ipcRenderer.on('add', (event, users) => {
   addUsersDb(users);
 });
 
-ipc.on('edit', (event, user) => {
+ipcRenderer.on('edit', (event, user) => {
   editUserDb(user);
 });
 
-ipc.on('sync_db', (event) => {
+ipcRenderer.on('sync_db', (event) => {
   initViewDb();
 });
 
-ipc.on('task_complete', (event, rows, taskName, params ) => {
-  completeUserTaskDb(rows, taskName, params);
+ipcRenderer.on('add_task', (event, tasks, users) => {
+  addTaskDb(tasks, users);
 });
 
-ipc.on('add_task', (event, task ) => {
-  addTaskDb(task);
-});
+function emitLoggerMessage(row_id, message) {
+  var logView = _.find(logControls, function(obj) { return obj.key == row_id })
+  if (logView) {
+    logView.control.send('append', message);
+  }
+}
 
 function checkSecurityController(cb) {
   checkLicense(cb);
@@ -113,40 +133,47 @@ function tasksController(action, rows) {
 }
 
 function showLogsController(rows) {
-  checkFolderExists(logsDir);
-  rows.forEach(function (row_id) {
-    var l_filepath = path.join(logsDir, row_id + ".txt");
-    if (fs.existsSync(l_filepath) ) {
-      let loggerView = new BrowserWindow({width: 600, height: 300, frame: true});
-      loggerView.setMenu(null)
-      loggerView.loadURL(url.format({
-        pathname: path.join(__dirname, 'html', 'log.html'),
-        protocol: 'file:',
-        slashes: true
-      }))
+  mkdirFolder(logsDir)
+  .then(function() {
+    rows.forEach(function (row_id) {
+      let loggerView;
+      var l_filepath = path.join(logsDir, row_id + ".txt");
+      if (fs.existsSync(l_filepath) ) {
+        loggerView = new BrowserWindow({width: 600, height: 300, frame: true});
+        loggerView.setMenu(null)
+        loggerView.loadURL(url.format({
+          pathname: path.join(__dirname, 'html', 'log.html'),
+          protocol: 'file:',
+          slashes: true
+        }))
 
-      loggerView.on('closed', function() {
-        loggerView = null;
-      });
-      loggerView.webContents.on('did-finish-load', () => {
-        loggerView.webContents.send('log_data', l_filepath, row_id);
-      });
+        loggerView.on('closed', function() {
+          loggerView = null;
+        });
 
-      fs.watchFile(l_filepath, (curr, prev) => {
-        if (curr == prev) {} else {
-          loggerView.webContents.send('log_data_changed', l_filepath, row_id);
-          // console.log(`the current mtime is: ${curr.mtime}`);
-          // console.log(`the previous mtime was: ${prev.mtime}`);
-        }
-      });
-      openDevTool(loggerView, devIsOpen);
-    } else {
-      dialog.showMessageBox({ 
-        message: `Логи для ${row_id} отсутствуют`,
-        buttons: ["OK"] 
-      });
-    }
-  });
+        loggerView.webContents.on('close', function() {
+          _.remove(logControls, {
+              key: row_id
+          });
+        });
+
+        loggerView.webContents.on('did-finish-load', () => {
+          var logControl = {
+            key: row_id,
+            control: loggerView.webContents
+          };
+          logControls.push(logControl);
+          loggerView.webContents.send('log_data', l_filepath, row_id);
+        });
+        openDevTool(loggerView, devIsOpen);
+      } else {
+        dialog.showMessageBox({ 
+          message: `Логи для ${row_id} отсутствуют`,
+          buttons: ["OK"] 
+        });
+      }
+    }); 
+  })
 }
 
 function addUsersController() {

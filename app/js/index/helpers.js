@@ -5,7 +5,59 @@
 'use strict';
 
 var fs = require('fs');
-var mkdirp = require('mkdirp');
+var mkdirp = require('mkdirp-promise');
+
+function mkdirFolder(filepath) {
+  return mkdirp(filepath);
+}
+
+function isIpBlock(number) {
+  return number >= 0 && number < 256;
+}
+
+function strInt(s) {
+  var i = parseInt(s, 10);
+  if( i != NaN && i.toString().length == s.length) {
+    return i;
+  }
+}
+
+function ipPortFunc(ip, port) {
+  var ipArray = ip.split(".");
+  if(ipArray.length == 4 && ipArray.every(isIpBlock)) {} 
+  else {
+    return false;
+  }
+  var port = strInt(port);
+  if(port && port > 0 && port < 65535) {} 
+  else {
+    return false;
+  }
+  return true;
+}
+
+function validateProxyString(proxyString) {
+  if(proxyString == '') {
+    return true;
+  }
+  var good = true;
+  var splited = proxyString.split(":");
+  /*  proxy_ip:proxy_port */
+  if(splited.length == 2) {
+    good = ipPortFunc(splited[0], splited[1]);
+  /*  proxy_name:proxy_pass:proxy_ip:proxy_port */
+  } else if(splited.length == 4) { 
+    good = ipPortFunc(splited[2], splited[3]);
+    var name = splited[0];
+    if(name.length == 0) {
+      good = false;
+    }
+    var pass = splited[1];
+  } else {
+    good = false;
+  }
+  return good;
+} 
 
 function setProxyFunc(proxyString) {
   if(proxyString.split(":").length == 2) {
@@ -25,17 +77,6 @@ function setProxyFunc(proxyString) {
   }
 }
 
-function generatePassword() {
-  return Math.random().toString(36).slice(-8).toUpperCase();
-}
-
-function checkFolderExists(filepath) {
-  mkdirp(filepath, function (err) {
-    if (err) console.error(err)
-    else console.log('pow!')
-  });
-}
-
 function appendStringFile(filepath, string) {
   fs.appendFile(filepath, string + '\n', (err) => {
     if (err) throw err;
@@ -50,10 +91,7 @@ function createFile(filename) {
         if(err) {
           console.log(err);
         }
-        // console.log("The file was saved!");
       });
-    } else {
-      // console.log("The file exists!");
     }
   });
 }
@@ -84,3 +122,10 @@ function convertTime(UNIX_timestamp) {
   var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
   return time;
 }
+
+///////
+
+function generatePassword() {
+  return Math.random().toString(36).slice(-8).toUpperCase();
+}
+

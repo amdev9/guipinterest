@@ -4,11 +4,6 @@
 
 $(function() {
 
-
-///////////////////////////////////////////
-////////////// PIN ////////////////////////
-///////////////////////////////////////////
-
   $("#create_accounts_form").validate({
     rules: {
       proxy_file: "required",
@@ -38,10 +33,6 @@ $(function() {
     }
   });
 
-
-///////////////////////////////////////////
-////////////// INSTA //////////////////////
-///////////////////////////////////////////
 
 
   $("#add_accounts_form").validate({
@@ -95,6 +86,7 @@ $(function() {
 
   $("#filtration_form").validate({
     rules: {
+      proxy_file: "required",
       forFilterFile: "required",
       followers_from: "required",
       followers_to: "required",
@@ -105,6 +97,7 @@ $(function() {
       filteredAccounts:  "required", 
     },
     messages: {
+      proxy_file: "Выберите файл",
       forFilterFile: "Выберите файл",
       filteredAccounts: "Выберите файл"
     },
@@ -122,13 +115,66 @@ $(function() {
     }
   });
 
+  function strInt(s) {
+    var i = parseInt(s, 10);
+    if( i != NaN && i.toString().length == s.length) {
+      return i;
+    }
+  }
+
+  function isIpBlock(number) {
+    return number >= 0 && number < 256;
+  }
+
+  function ipPortFunc(ip, port) {
+    var ipArray = ip.split(".");
+    if(ipArray.length == 4 && ipArray.every(isIpBlock)) {} 
+    else {
+      return false;
+    }
+    var port = strInt(port);
+    if(port && port > 0 && port < 65535) {} 
+    else {
+      return false;
+    }
+    return true;
+  }
+
+  $.validator.addMethod(
+    "proxy_checker",
+    function(proxyString, element, flag) {
+      var good = true;
+      var splited = proxyString.split(":");
+      /*  proxy_ip:proxy_port */
+      if(splited.length == 2) {
+        good = ipPortFunc(splited[0], splited[1]);
+      /*  proxy_name:proxy_pass:proxy_ip:proxy_port */
+      } else if(splited.length == 4) { 
+        good = ipPortFunc(splited[2], splited[3]);
+        var name = splited[0];
+        if(name.length == 0) {
+          good = false;
+        }
+        var pass = splited[1];
+      } else {
+        good = false;
+      }
+      return this.optional(element) || good;
+    },
+    "Please check your input."
+  );
 
   $("#edit_form").validate({
     rules: {
       username: "required",
       password: "required",
+      proxy: {
+        required: false,
+        proxy_checker: true
+      }
     },
     messages: {
+      proxy: "Некорректный формат",
       username: "Введите логин",
       password: "Введите пароль",
     },

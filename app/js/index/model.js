@@ -15,12 +15,18 @@ var softname = config.App.softname;
  
 var levelPath = path.join(os.tmpdir(), softname, 'levdb');
 var logsDir = path.join(os.tmpdir(), softname, 'logs');
-checkFolderExists(levelPath);
-var db = new PouchDB(levelPath , {adapter: 'leveldb'});
-// PouchDB.debug.enable('*');
-PouchDB.debug.disable();
-// dropDb();
+var db;
 
+function initDb() {
+  return mkdirFolder(levelPath)
+    .then(function() {
+      db = new PouchDB(levelPath , {adapter: 'leveldb'});
+      // PouchDB.debug.enable('*');
+      PouchDB.debug.disable();
+      // dropDb();
+      return db;
+    });
+}
 
 function dropDb() {
   db.destroy().then(function (response) {
@@ -30,48 +36,55 @@ function dropDb() {
   });
 }
 
-function createAccountsTaskDb(task) {
-  db.put(task).then(function (response) {
-    if(!task._rev) {
-      renderTaskRowView(response.id, task.name);
-    }
-  }).catch(function (err) {
-    console.log(err);
-  });
-}
 
-function addTaskDb(task) { 
-  if (task.name == 'create_accounts') {
-    createAccountsTaskDb(task);
+function addTaskDb(tasks, users) { 
+  if (users) {
+    usersTaskDb(tasks, users);
+  } else {
+    var task = tasks;
+    if (task.name == 'create_accounts') {
+      createAccountsTaskDb(task);
+    }
   }
 }
 
+
+function userObj(userArr) {
+  this._id = userArr[0];
+  this.username = userArr[0];   
+  this.password = userArr[1];
+  this.proxy = userArr[2];
+  this.type = 'user';
+  this.cookie = '';
+  this.task = '-';
+  this.status = '-';
+}
+
 function addUsersDb(users) {
+  // pass user data fill to add js
+  var usersObjArr = [];
+  var usersRender = [];
   users.forEach(function(userString, i, fullArr) {
     var userArr = userString.split('|');
-    var usersObjArr = [];
     if (userArr.length == 3) {
-      var user = {};
-      user._id = userArr[0];
-      user.username = userArr[0];   
-      user.password = userArr[1];
-      user.proxy = userArr[2];
-      user.type = 'user';
-      user.cookie = '';
-      user.task = '-';
-      user.status = '-';
-      usersObjArr.push(user);
-      if ( i == fullArr.length - 1 ) {
+      var user = new userObj(userArr);
+      if(validateProxyString(user.proxy)) {
+        usersObjArr.push(user);
+      }
+      if ( i == fullArr.length - 1) {
+        
         db.bulkDocs(usersObjArr)
           .then(function (response) {
+
             response.forEach(function(item, i, arr) {
-              if (item.error == true) {
-                usersObjArr.splice(i, 1);
-              }
-              if (i == arr.length - 1) {
-                renderUserRowView(usersObjArr);
+              if (item.ok) {
+                usersRender.push(usersObjArr[i]);
+                if (i == arr.length - 1) {
+                  renderUserRowView(usersRender);
+                }
               }
             });
+
         }).catch(function (err) {
           console.log(err);
         });
@@ -86,9 +99,8 @@ function runTasksDb(rows) {
       if (row.type == 'user') {
 
       } else if (row.type == 'task') {
-        var task = row;
-        if (task.name == 'create_accounts') {
-          apiCreateAccounts(task);
+        if (row.name == 'create_accounts') {
+          apiCreateAccounts(row);
         }
       }
     }).catch(function (err) {
@@ -116,11 +128,11 @@ function getExistedUserRows(rows) {
 function completeUserTaskDb(rows, taskName, params) {
   getExistedUserRows(rows)
     .then(function(result) {
-      // if (taskName == 'parse_concurrents') {
-      //   parseConcurrentsUserDb(result);
-      // } else if (taskName == 'filtration') {
-      //   filtrationUserDb(result);
-      // }
+      if (taskName == 'parse_concurrents') {
+        parseConcurrentsUserDb(result, taskName, params);
+      } else if (taskName == 'filtration') {
+        filtrationUserDb(result, taskName, params);
+      }
   }).catch(function(err) {
     console.log(err);
   });
@@ -130,7 +142,7 @@ function checkAccountsDb(user_ids) {
   user_ids.forEach(function(user_id) {
 
     db.get(user_id).then(function(user) {
-      apiSessionCheck(user._id, user.username, user.password); // add proxy
+      apiSessionCheck(user._id, user.username, user.password, user.proxy); 
     }).catch(function(err) {
       console.log(err);
     });
@@ -138,20 +150,23 @@ function checkAccountsDb(user_ids) {
 }
 
 function loggerDb(user_id, logString) {
-  checkFolderExists(logsDir);
-  var dateTimeTxt = getTimeStamp();
-  db.get(user_id).then(function(user) {
-    if (user.username) {
-      var l_string = dateTimeTxt + user.username + ": " + logString;
-    } else {
-      var l_string = dateTimeTxt + user.name + ": " + logString;
-    }
-    var l_filepath = path.join(logsDir, user._id + ".txt");
-    createFile(l_filepath);
-    appendStringFile(l_filepath, l_string);
-  }).catch(function (err) {
-    console.log(err);
-  });
+  mkdirFolder(logsDir)
+    .then(function() {
+      var dateTimeTxt = getTimeStamp();
+      db.get(user_id).then(function(user) { // do we need this hah???
+        if (user.username) {
+          var l_string = dateTimeTxt + user.username + ": " + logString;
+        } else {
+          var l_string = dateTimeTxt + user.name + ": " + logString;
+        }
+        var l_filepath = path.join(logsDir, user._id + ".txt");
+        createFile(l_filepath);
+        emitLoggerMessage(user._id, l_string);  // emit message to opened views  FIX 
+        appendStringFile(l_filepath, l_string);
+      }).catch(function (err) {
+        console.log(err);
+      });
+    })
 }
 
 function getItemDb(row_id, webcontents) {
@@ -179,6 +194,21 @@ function updateUserStatusDb(user_id, statusValue) {
     userRowRenderView(user_id);
   }).catch(function (err) {
     console.log(err);
+  });
+}
+
+function usersTaskDb(tasks, users) {
+  users.forEach(function(user_id, i) {
+    db.get(user_id).then(function(user) {
+      user.task = tasks[i];
+      db.put(user).then(function(result) {
+        setTaskView(user._id, user.task.name);
+      }).catch(function (err) {
+        console.log(err);
+      });
+    }).catch(function (err) {
+      console.log(err);
+    });
   });
 }
 
@@ -280,38 +310,61 @@ function editUserDb(item) {
 }
 
 function initViewDb() {
-  var ddoc2 = {
-    _id: '_design/index',
-    views: {
-      index: {
-        map: function mapFun(doc) {
-          if (doc.type) {
-            emit(doc.type);
-          }
-        }.toString()
+  initDb()
+  .then(function(db) {
+    var ddoc2 = {
+      _id: '_design/index',
+      views: {
+        index: {
+          map: function mapFun(doc) {
+            if (doc.type) {
+              emit(doc.type);
+            }
+          }.toString()
+        }
       }
     }
-  }
+    return ddoc2;
+  })
+  .then(function(ddoc2) {
 
-  db.put(ddoc2).catch(function (err) {
-    if (err.name !== 'conflict') {
-      throw err;
+    db.put(ddoc2).catch(function (err) {
+      if (err.name !== 'conflict') {
+        throw err;
+      }
+    }).then( function() {
+      return db.query('index', {
+        key: 'task',
+        include_docs: true
+      });
+    }).then(function (result) {
+      initTaskRowRenderView(result.rows);
+    }).then(function () {
+      return db.query('index', {
+        key: 'user',
+        include_docs: true
+      });
+    }).then(function (result) {
+
+      initUserRowRenderView(result.rows); 
+
+    }).catch(function (err) {
+      console.log(err);
+    });
+  })
+}
+
+
+
+function createAccountsTaskDb(task) {
+  db.put(task).then(function (response) {
+    if(!task._rev) {
+      renderTaskRowView(response.id, task.name);
     }
-  }).then( function() {
-    return db.query('index', {
-      key: 'task',
-      include_docs: true
-    });
-  }).then(function (result) {
-    initTaskRowRenderView(result.rows);
-  }).then(function () {
-    return db.query('index', {
-      key: 'user',
-      include_docs: true
-    });
-  }).then(function (result) {
-    initUserRowRenderView(result.rows); 
   }).catch(function (err) {
     console.log(err);
   });
 }
+
+
+
