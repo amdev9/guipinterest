@@ -80,7 +80,6 @@ function setProxyFunc(proxyString) {
 function appendStringFile(filepath, string) {
   fs.appendFile(filepath, string + '\n', (err) => {
     if (err) throw err;
-    console.log('appended to file');
   });
 }
 

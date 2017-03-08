@@ -43,7 +43,7 @@ function addTaskDb(tasks, users) {
   } else {
     var task = tasks;
     if (task.name == 'create_accounts') {
-      createAccountsTaskDb(task);
+      TaskDb(task);
     }
   }
 }
@@ -354,9 +354,7 @@ function initViewDb() {
   })
 }
 
-
-
-function createAccountsTaskDb(task) {
+function TaskDb(task) {
   db.put(task).then(function (response) {
     if(!task._rev) {
       renderTaskRowView(response.id, task.name);
@@ -365,6 +363,4 @@ function createAccountsTaskDb(task) {
     console.log(err);
   });
 }
-
-
 

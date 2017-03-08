@@ -34,7 +34,6 @@ $(function() {
   });
 
 
-
   $("#add_accounts_form").validate({
     rules: {
       add_acc_txt_file: "required",

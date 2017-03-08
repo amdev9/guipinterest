@@ -17,7 +17,6 @@ var logsDir = path.join(os.tmpdir(), softname, 'logs')
 
 
 document.title = softname
-
 var logControls = [];
 
 // Display the current version
