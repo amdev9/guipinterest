@@ -217,6 +217,8 @@ class Request {
     // }
     if (_.isString(json.message) && json.message.toLowerCase().indexOf('entered is incorrect') !== -1) 
       throw new Exceptions.AuthenticationError();
+    else if (_.isString(json.message) && json.message.toLowerCase().indexOf('email you entered does not belong') !== -1) 
+      throw new Exceptions.EmailNotFound();
     throw new Exceptions.RequestError(json);
   }
 

@@ -38,12 +38,21 @@ function AuthenticationError(message) {
 util.inherits(AuthenticationError, APIError);
 exports.AuthenticationError = AuthenticationError;
 
+function EmailNotFound(message) {
+    this.name = "EmailNotFound";
+    this.message = message || "The email you entered does not belong to any account";
+}
+util.inherits(EmailNotFound, APIError);
+exports.EmailNotFound = EmailNotFound;
+
 function ParseError(response, request) {
     this.name = "ParseError";
     this.message = "Not possible to parse API response";
     this.response = response;
     this.request = request;
 }
+
+
 
 util.inherits(ParseError, APIError);
 exports.ParseError = ParseError;
