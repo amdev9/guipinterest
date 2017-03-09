@@ -127,6 +127,7 @@ function editCreateAccounts(task) {
   checkDisabler();
 }
  
+
 function createAccounts(taskName) {
   var task = {};
   var domContainer = $("div.container").data('task');

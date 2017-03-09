@@ -198,7 +198,7 @@ function apiCreateAccounts(task) {
         
         async.mapValues(_.object(email_tuple[i], proxy_array), function (proxy, email, callback) {
           if(config.App.devTools == false) {
-            setProxyFunc(proxy);
+            setProxyFunc(proxy); ////////////// ???????
           }
           var storage = path.join(cookieDir, email + '.json')
           fs.closeSync(fs.openSync(storage, 'w') );
@@ -259,11 +259,8 @@ function apiSessionCheck(user_id, username, password, proxy) {
     var cookiePath = path.join(cookieDir, user_id + ".json");
     createFile(cookiePath);
 
-    if(_.isString(proxy) && !_.isEmpty(proxy)) {
-      setProxyFunc(proxy); //session proxy
-    }
-
-    Client.Session.create(cookiePath, username, password) // check for created file
+    
+    Client.Session.create(cookiePath, username, password, returnProxyFunc(proxy) ) // check for created file
       .then(function (session) {
         updateUserStatusDb(user_id, 'Активен');
         setStateView(user_id, 'stopped');

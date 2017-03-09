@@ -4,10 +4,13 @@ var Resource = require('./resource');
 var Request = require('./request');
 var request = require('request-promise');
 var Exceptions = require('./exceptions')
+var _ = require('lodash')
 
 class Session {
-  constructor(storage) {
+  constructor(storage, proxy) {
     this.setCookiesStorage(storage);
+    if(_.isString(proxy) && !_.isEmpty(proxy))
+      this.proxyUrl = proxy;
   }
 
   get jar() { return this._jar }
@@ -30,6 +33,15 @@ class Session {
   }
   set Authorization(val) {}
  
+  get proxyUrl() { 
+    return this._proxyUrl;
+  }
+  set proxyUrl(val) {
+    if (!Helpers.isValidUrl(val) && val !== null)
+      throw new Error("`proxyUrl` argument is not an valid url")
+    this._proxyUrl = val;
+  }
+
   setName(name) {
     this._name = name;
     return this;
@@ -85,9 +97,11 @@ class Session {
     })
   }
 
-  static create(storage, email, password) { 
+  static create(storage, email, password, proxy) { 
     var that = this;
     var session = new Session(storage);
+    if(_.isString(proxy) && !_.isEmpty(proxy))
+      session.proxyUrl = proxy;
     return Session.login(session, email, password); 
   }
 }

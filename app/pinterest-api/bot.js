@@ -21,6 +21,7 @@ var promise = pin.Gatekeeper.experiments()
   console.log(session)
   return session;
 })
+
 // .then(function(session) {
  
 //   return [session, pin.Interests.get (session, 'womens_fashion')]; 

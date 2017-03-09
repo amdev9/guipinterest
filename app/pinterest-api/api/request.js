@@ -88,11 +88,17 @@ class Request {
     if(session.Authorization) {
       this.setAuthorization(session.Authorization);
     }
+    if(session.proxyUrl) {
+      this.setOptions({proxy: session.proxyUrl});
+    }
     this.setOptions({
       jar: session.jar
     });
     return this;
   }
+
+
+
 
   setHeaders(headers) {
     this._request.headers = _.extend(this._request.headers, headers || {});
