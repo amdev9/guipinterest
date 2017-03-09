@@ -3,7 +3,8 @@ var FileCookieStore = require('tough-cookie-filestore');
 var Resource = require('./resource');
 var Request = require('./request');
 var request = require('request-promise');
- 
+var Exceptions = require('./exceptions')
+
 class Session {
   constructor(storage) {
     this.setCookiesStorage(storage);
@@ -69,16 +70,18 @@ class Session {
     })
     .setResourceSigned('login')
     .send()
-    .catch(function(error) {
+    .catch(function (error) {
+      if (error.name == "RequestError" && 
+       _.isString(error.json.message) && 
+          error.json.message.toLowerCase().indexOf('entered is incorrect') !== -1) {
+        throw new Exceptions.AuthenticationError(error.json.message);
+      }
       throw error;
     })
     .then(function(res) {
       var access_token = res.data.access_token;
       session.setAuthorization(access_token);
       return session;
-    })
-    .catch(function(error) {
-      console.log(error);
     })
   }
 

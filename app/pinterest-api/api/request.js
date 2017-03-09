@@ -2,7 +2,7 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var request = require('request-promise');
 var concat = require('concat-stream')
-
+var Exceptions = require('./exceptions')
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -154,6 +154,10 @@ class Request {
     return response;
   }
 
+  beforeError(error, request, attemps) {
+    throw error;
+  }
+
   _initialize() {
   // Easier for inheritence
   }
@@ -197,6 +201,25 @@ class Request {
     return response;
   }
 
+  errorMiddleware(response) {
+    response = this.parseMiddleware(response)
+    var json = response.body
+    // if (json.spam) {
+    //   throw new Exceptions.ActionSpamError(json)
+    // }
+    // if (json.message == 'checkpoint_required')
+    //   throw new Exceptions.CheckpointError(json, this.session);
+    // if (json.message == 'login_required')
+    //   throw new Exceptions.AuthenticationError("Login required to process this request");
+    // if (response.statusCode===429 || _.isString(json.message) && json.message.toLowerCase().indexOf('too many requests') !== -1)
+    // {
+    //   throw new Exceptions.RequestsLimitError();
+    // }
+    if (_.isString(json.message) && json.message.toLowerCase().indexOf('entered is incorrect') !== -1) 
+      throw new Exceptions.AuthenticationError();
+    throw new Exceptions.RequestError(json);
+  }
+
   send(options, attemps) {
     var that = this;
     if (!attemps) attemps = 0;
@@ -213,40 +236,76 @@ class Request {
       .then(function(opts) { 
         options = opts
 
-        return new Promise(function(resolve, reject) {
-          var xhr = Request.requestClient(options)
+        // return new Promise(function(resolve, reject) {
+        //   var xhr = Request.requestClient(options)
 
-          var res;
-          var body = concat(function(data) {
-            res.body = data.toString();
-            resolve([res, options, attemps]);
-          })
+        //   var res;
+        //   var body = concat(function(data) {
+        //     res.body = data.toString();
+        //     resolve([res, options, attemps]);
+        //   })
 
-          xhr.on('response', function(response) {
-            res = response;
-          }).on('data', function(chunk) {
-            body.write(chunk);
-          }).on('end', function() {
-            body.end()
-          });
+        //   xhr.on('response', function(response) {
+        //     res = response;
+        //   }).on('data', function(chunk) {
+        //     body.write(chunk);
+        //   }).on('end', function() {
+        //     body.end()
+        //   });
 
-          if (Request.token) {          
-            Request.token.cancel = function() { 
-              xhr.abort();
-              reject(new Error("Cancelled"));
-            };
-          }
-        });
+        //   if (Request.token) {          
+        //     Request.token.cancel = function() { 
+        //       xhr.abort();
+        //       reject(new Error("Cancelled"));
+        //     };
+        //   }
+        // });
 
-        // return [Request.requestClient(options), options, attemps]
+        return [Request.requestClient(options), options, attemps]
       })
       .spread(_.bind(this.beforeParse, this))
       .then(_.bind(this.parseMiddleware, this))
       .then(function (response) {
-        return response.body;
+        var json = response.body;
+        if (_.isObject(json) && json.status == "success") {
+          return response.body
+        }
+        throw new Exceptions.RequestError(json);
       })
       .catch(function(error) {
-        console.log(error);
+        return that.beforeError(error, options, attemps)
+      })
+      .catch(function (err) {
+        if (err instanceof Exceptions.APIError) {
+          throw err;
+        }
+        if(!err || !err.response) {
+          throw err;    
+        }
+
+        var response = err.response;
+        if (response.statusCode == 404)
+          throw new Exceptions.NotFoundError(response);
+        if (response.statusCode >= 500) {
+          if (attemps <= that.attemps) {
+            attemps += 1;
+            return that.send(options, attemps)
+          } else {
+            throw new Exceptions.ParseError(response, that);
+          }
+        } else {
+          that.errorMiddleware(response)
+        }
+      })
+
+      .catch(function (error) {
+        if (error instanceof Exceptions.APIError)
+          throw error;
+        error = _.defaults(error, { message: 'Fatal internal error!' });
+        throw new Exceptions.RequestError(error);
+      })
+      .catch(function(error) {
+        return that.afterError(error, options, attemps)
       })
   }
 }

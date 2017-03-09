@@ -20,5 +20,6 @@ PinterestAPI.Request = require('./api/request')
 PinterestAPI.Constants = require('./api/constants')
 PinterestAPI.Resource = require('./api/resource')
 PinterestAPI.Session = require('./api/session')
+PinterestAPI.Exceptions = require('./api/exceptions')
 
 module.exports = PinterestAPI
