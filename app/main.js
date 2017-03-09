@@ -116,7 +116,8 @@ autoUpdater.on('checking-for-update', () => {})
 autoUpdater.on('update-available', (ev, info) => {})
 autoUpdater.on('update-not-available', (ev, info) => {})
 autoUpdater.on('error', (ev, err) => {
-  dialog.showErrorBox('Ошибка обновления', 'Произошла ошибка при обновлении программы')
+  if(!devIsOpen)
+    dialog.showErrorBox('Ошибка обновления', 'Произошла ошибка при обновлении программы')
 })
 autoUpdater.on('download-progress', (ev, progressObj) => {})
 
