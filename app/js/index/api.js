@@ -147,6 +147,53 @@ function fastCreateAccount(session, cb) {
   })
 }
 
+
+function apiRepin() {
+  mkdirFolder(logsDir)
+  .then(function() {
+    var pinId = '99782947965079223';
+    var board_id = '459859880640556506';
+
+    var promise = pin.Gatekeeper.experiments()
+    .then(function(res) {
+      return pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
+    })
+
+    // .then(function(session) {
+    //   return [session, pin.Boards.add(session, 'superttt')]
+    // })
+    .then(function(session) {
+      return [session, pin.Users.meBoards(session)] 
+    })
+    .spread(function(session, res) {
+      return [session, pin.Users.boardPickerShortlist(session, pinId)]
+    })
+    .spread(function(session, res) {
+      return [session, pin.Pins.get(session, pinId)]
+    })
+    .spread(function(session, res) {
+
+      var image_signature = res.data.image_signature;
+      var closeup_user_note = res.data.closeup_user_note;
+      var aggregatedpindata_id = res.data.aggregated_pin_data.id;
+
+      var data = {
+        'requests': "[" + JSON.stringify({
+          "method": "POST",
+          "uri"   : "/v3/pins/"+ pinId +"/repin/",
+          "params": {
+            "image_signature": image_signature,
+            "share_twitter": "0",
+            "board_id": board_id,
+            "description": closeup_user_note
+          }
+        }) + "]" 
+      }
+      return [session, pin.Batch.post(session, data)]
+    })
+  })
+}
+
 function apiCreateAccounts(task) {
   mkdirFolder(logsDir)
   .then(function() {
@@ -253,6 +300,7 @@ function apiCreateAccounts(task) {
 function apiSessionCheck(user_id, username, password, proxy, token) {
  mkdirFolder(cookieDir)
   .then(function() {
+    
 
     setStateView(user_id, 'run');
     loggerDb(user_id, 'Выполняется логин');
