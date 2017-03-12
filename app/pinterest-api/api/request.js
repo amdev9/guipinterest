@@ -37,8 +37,8 @@ class Request {
     this._initialize.apply(this, arguments);    
     this._transform = function(t) { return t };
   }
-
-  static setStopToken(token) {
+ 
+  static setToken(token) {
     Request.token = token;
   }
 
@@ -244,37 +244,45 @@ class Request {
       .then(function(opts) { 
         options = opts
 
-        // return new Promise(function(resolve, reject) {
-        //   var xhr = Request.requestClient(options)
+        return new Promise(function(resolve, reject) {
+          var xhr = Request.requestClient(options)
 
-        //   var res;
-        //   var body = concat(function(data) {
-        //     res.body = data.toString();
-        //     resolve([res, options, attemps]);
-        //   })
+          var res;
+          var body = concat(function(data) {
+            res.body = data.toString();
+            if (res.statusCode == 200 ) {
+              resolve([res, options, attemps]);
+            } else {
+              reject(res)
+            }
+          })
 
-        //   xhr.on('response', function(response) {
-        //     res = response;
-        //   }).on('data', function(chunk) {
-        //     body.write(chunk);
-        //   }).on('end', function() {
-        //     body.end()
-        //   });
+          xhr.on('response', function(response) {
+            res = response;
+          }).on('data', function(chunk) {
+            body.write(chunk);
+          }).on('end', function() {
+            body.end()
+          }).catch(function(err) {
+          })
+          .then(function(res) {
+          });
 
-        //   if (Request.token) {          
-        //     Request.token.cancel = function() { 
-        //       xhr.abort();
-        //       reject(new Error("Cancelled"));
-        //     };
-        //   }
-        // });
+          if (Request.token) {          
+            Request.token.cancel = function() { 
+              xhr.abort();
+              reject(new Error("Cancelled"));
+            };
+          }
+        });
 
-        return [Request.requestClient(options), options, attemps]
+        // return [Request.requestClient(options), options, attemps]
       })
       .spread(_.bind(this.beforeParse, this))
       .then(_.bind(this.parseMiddleware, this))
       .then(function (response) {
         var json = response.body;
+        console.log(response)
         if (_.isObject(json) && json.status == "success") {
           return response.body
         }
@@ -284,14 +292,19 @@ class Request {
         return that.beforeError(error, options, attemps)
       })
       .catch(function (err) {
-        if (err instanceof Exceptions.APIError) {
-          throw err;
-        }
-        if(!err || !err.response) {
-          throw err;    
+        if(err.message == 'Cancelled') {        
+          throw new Exceptions.RequestCancel();
         }
 
-        var response = err.response;
+        // if (err instanceof Exceptions.APIError) {
+        //   throw err;
+        // }
+        // if(!err || !err.response) {
+        //   throw err;    
+        // }
+
+        var response = err //.response;
+        console.log(response)
         if (response.statusCode == 404)
           throw new Exceptions.NotFoundError(response);
         if (response.statusCode >= 500) {

@@ -250,7 +250,7 @@ function apiCreateAccounts(task) {
 }
 
 
-function apiSessionCheck(user_id, username, password, proxy) {
+function apiSessionCheck(user_id, username, password, proxy, token) {
  mkdirFolder(cookieDir)
   .then(function() {
 
@@ -258,21 +258,29 @@ function apiSessionCheck(user_id, username, password, proxy) {
     loggerDb(user_id, 'Выполняется логин');
     var cookiePath = path.join(cookieDir, user_id + ".json");
     createFile(cookiePath);
-
-    
+    Client.Request.setToken(token)
     Client.Session.create(cookiePath, username, password, returnProxyFunc(proxy) ) // check for created file
       .then(function (session) {
         updateUserStatusDb(user_id, 'Активен');
         setStateView(user_id, 'stopped');
       }).catch(function (err) {
-        setStateView(user_id, 'stopped');
-        if (err instanceof Client.Exceptions.APIError) {
-          updateUserStatusDb(user_id, err.name);
-          console.log(err);
-        } else {
-          updateUserStatusDb(user_id, 'Произошла ошибка');
-          console.log(err);
-        }
+        
+          setStateView(user_id, 'stopped');
+          if (err instanceof Client.Exceptions.APIError) {
+            if(err.ui) {
+              updateUserStatusDb(user_id, err.ui); 
+            } else if (err.name == 'RequestCancel') {
+              
+            } else {
+              updateUserStatusDb(user_id, err.name);
+            }
+          } else if (err.message == 'stop') {
+
+          } else {
+            updateUserStatusDb(user_id, 'Произошла ошибка');
+            console.log(err);
+          }
+
       });
   })
   .catch(function(err) {

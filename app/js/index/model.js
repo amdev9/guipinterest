@@ -16,6 +16,7 @@ var softname = config.App.softname;
 var levelPath = path.join(os.tmpdir(), softname, 'levdb');
 var logsDir = path.join(os.tmpdir(), softname, 'logs');
 var db;
+var tokens = new Map();
 
 function initDb() {
   return mkdirFolder(levelPath)
@@ -77,9 +78,9 @@ function addUsersDb(users) {
             response.forEach(function(item, i, arr) {
               if (item.ok) {
                 usersRender.push(usersObjArr[i]);
-                if (i == arr.length - 1) {
-                  renderUserRowView(usersRender);
-                }
+              }
+              if (i == arr.length - 1) {
+                renderUserRowView(usersRender);
               }
             });
 
@@ -137,10 +138,14 @@ function completeUserTaskDb(rows, taskName, params) {
 }
 
 function checkAccountsDb(user_ids) {
+  tokens.clear()
   user_ids.forEach(function(user_id) {
-
     db.get(user_id).then(function(user) {
-      apiSessionCheck(user._id, user.username, user.password, user.proxy); 
+      var token = {
+          row: user._id
+      }
+      tokens.set(user._id, token)
+      apiSessionCheck(user._id, user.username, user.password, user.proxy, token); 
     }).catch(function(err) {
       console.log(err);
     });

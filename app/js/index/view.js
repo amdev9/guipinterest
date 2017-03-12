@@ -115,11 +115,12 @@ function setStatusView(id, status) {
 }
 
 function addStopStateView(rows_ids) {
-  tokenCancel();
-  rows_ids.forEach( function(user_id) {
-    var state = getStateView(user_id);
+  rows_ids.forEach( function(row_id) {
+    var t = tokens.get(row_id);
+    t.cancel();
+    var state = getStateView(row_id);
     if (state != 'stopped') {
-      setStateView(user_id, 'stop');
+      setStateView(row_id, 'stop');
     }
   })
 }

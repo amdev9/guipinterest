@@ -17,6 +17,14 @@ APIError.prototype.serialize = function() {
   }
 };
 
+function RequestCancel() {
+    this.name = "RequestCancel";
+    this.message = "Cancelled";
+}
+util.inherits(RequestCancel, APIError);
+exports.RequestCancel = RequestCancel;
+
+
 function RequestError(payload) {
   this.name = "RequestError";
   this.message = "It's not possible to make request!";
@@ -34,6 +42,7 @@ exports.RequestError = RequestError;
 function AuthenticationError(message) {
     this.name = "AuthenticationError";
     this.message = message || "Not possible to authenticate";
+    this.ui = "Неверный пароль"
 }
 util.inherits(AuthenticationError, APIError);
 exports.AuthenticationError = AuthenticationError;
@@ -41,6 +50,7 @@ exports.AuthenticationError = AuthenticationError;
 function EmailNotFound(message) {
     this.name = "EmailNotFound";
     this.message = message || "The email you entered does not belong to any account";
+    this.ui = "Неверный email"
 }
 util.inherits(EmailNotFound, APIError);
 exports.EmailNotFound = EmailNotFound;

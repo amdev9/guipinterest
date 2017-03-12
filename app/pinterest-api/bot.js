@@ -15,12 +15,13 @@ var token = {};
 pin.Request.setStopToken(token);
 var promise = pin.Gatekeeper.experiments()
 .then(function(res) {
-  return pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
+  console.log(res)
+  // return pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
 })
-.then(function(session) {
-  console.log(session)
-  return session;
-})
+// .then(function(session) {
+//   console.log(session)
+//   return session;
+// })
 
 // .then(function(session) {
  
@@ -38,7 +39,7 @@ var promise = pin.Gatekeeper.experiments()
 //   if (typeof token.cancel === "function") { 
 //     token.cancel()
 //   }
-// }, 65)
+// }, 5)
 
 
 
