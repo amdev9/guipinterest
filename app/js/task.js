@@ -30,7 +30,7 @@ ipc.on('edit', (event, task) => {
 
 function updateElementsAccessibility(type) {
   if (type == 'user') {
-    updateElemView([]);
+    updateElemView(['repin']);
   } else {
     updateElemView(['create_accounts']);
     // disableCustomElem();

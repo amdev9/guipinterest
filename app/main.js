@@ -7,6 +7,7 @@ var config = require('./config/default')
 const devIsOpen = config.App.devTools
 const os = require('os')
 
+
 let template = []
 const name = app.getName()
 if (process.platform === 'darwin') {
