@@ -105,7 +105,7 @@
             <div class="form-group row align-items-center">
               <div class="form-check">
                 <label class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="own_emails">
+                  <input type="checkbox" class="custom-control-input" id="last_board">
                   <span class="custom-control-indicator"></span>
                   <span class="custom-control-description form-control-sm">Использовать последнюю добавленную доску</span>
                 </label>
@@ -113,21 +113,21 @@
             </div>
           
             <div class="form-group row align-items-center">
-              <textarea class="form-control" id="parsed_own_emails" name="parsed_own_emails" rows="3"></textarea>
+              <textarea class="form-control" id="parsed_pins" name="parsed_pins" rows="3"></textarea>
             </div>
             <div class="form-group row align-items-centers">
               <div class="col-3">
-                <button id="clean_own_emails" onclick="clearTextArea('parsed_own_emails');return false" class="btn btn-primary btn-sm">Очистить</button>
+                <button id="clean_pins" onclick="clearTextArea('parsed_pins');return false" class="btn btn-primary btn-sm">Очистить</button>
               </div>
               <div class="col-3">
-                <button id="open_own_emails" onclick="openParse('parsed_own_emails');return false" class="btn btn-primary btn-sm">Выбрать файл с пинами</button>
+                <button id="open_pins" onclick="openParse('parsed_pins');return false" class="btn btn-primary btn-sm">Выбрать файл с пинами</button>
               </div>
             </div>
               
             <div class="form-group row align-items-center">
               <label for="reg_count" class="col-form-label form-control-sm offset-1">Задержка между репинами (сек)</label>
               <div class="col-3">
-                <input class="form-control form-control-sm" type="number" value="0" min="0" name="reg_timeout" id="reg_timeout">
+                <input class="form-control form-control-sm" type="number" value="0" min="0" name="timeout" id="timeout">
               </div>
             </div>
 

@@ -155,7 +155,35 @@ function createAccounts(taskName) {
   ipc.send('add_task_event', task);
   window.close();
 }
- 
+
+function repin(taskName) {
+  // var task = {};
+  // var domContainer = $("div.container").data('task');
+  // if (domContainer) {
+  //   task._id = domContainer._id;
+  //   task._rev = domContainer._rev;
+  // } else {
+  //   task._id = new Date().toISOString();
+  // }
+  
+  // task.status = '-';
+  // task.name = taskName;
+  // task.type = 'task';
+  // task.email_parsed = '';
+  // task.own_emails = document.getElementById("own_emails").checked;
+  // if(document.getElementById("own_emails").checked == true) {
+  //   task.email_parsed = document.getElementById("parsed_own_emails").value.split('\n').filter(isEmpty);
+  // } else {
+  //   task.emails_cnt = document.getElementById("reg_count").value;
+  // }
+  // task.reg_timeout = document.getElementById("reg_timeout").value;
+  // task.proxy_file = document.getElementById("proxy_file").value;
+  // task.output_file = document.getElementById("output_file").value;
+
+  // ipc.send('add_task_event', task);
+  window.close();
+}
+
 function completeTask(taskName) {
   if (taskName == 'parse_concurrents') {
     parseConcurrents(taskName);
@@ -163,6 +191,8 @@ function completeTask(taskName) {
     filtration(taskName);
   } else if (taskName == 'create_accounts') {
     createAccounts(taskName);
+  } else if (taskName == 'repin') {
+    repin(taskName);
   }
 }
 

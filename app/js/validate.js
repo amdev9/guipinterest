@@ -4,6 +4,28 @@
 
 $(function() {
 
+    $("#repin_form").validate({
+    rules: {
+       
+    },
+    messages: {
+       
+    },
+    highlight: function(element) {
+      $(element).closest('.form-group').addClass('has-danger');
+    },
+    unhighlight: function(element) {
+      $(element).closest('.form-group').removeClass('has-danger');
+    },
+    errorElement: 'span',
+    errorClass: 'form-control-feedback form-control-sm',
+
+    submitHandler: function(form) {
+      completeTask('repin');
+    }
+  });
+
+
   $("#create_accounts_form").validate({
     rules: {
       proxy_file: "required",
