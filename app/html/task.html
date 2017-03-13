@@ -11,6 +11,9 @@
   body {
     padding-top: 40px;
   }
+  textarea {
+    font-size: 14px !important;
+  }
 </style>
 
 </head>
@@ -53,14 +56,14 @@
             </div>
           
             <div class="form-group row align-items-center">
-              <textarea class="form-control" id="parsed_own_emails" name="parsed_own_emails" rows="3"></textarea>
+              <textarea class="form-control" id="parsed_own_emails" name="parsed_own_emails" rows="3" disabled></textarea>
             </div>
             <div class="form-group row align-items-centers">
               <div class="col-3">
-                <button id="clean_own_emails" onclick="clearTextArea('parsed_own_emails');return false" class="btn btn-primary btn-sm">Очистить</button>
+                <button id="clean_own_emails" onclick="clearTextArea('parsed_own_emails');return false" class="btn btn-primary btn-sm" disabled>Очистить</button>
               </div>
               <div class="col-3">
-                <button id="open_own_emails" onclick="openParse('parsed_own_emails');return false" class="btn btn-primary btn-sm">Выбрать файл с почтами</button>
+                <button id="open_own_emails" onclick="openParse('parsed_own_emails');return false" class="btn btn-primary btn-sm" disabled>Выбрать файл с почтами</button>
               </div>
             </div>
               
@@ -97,10 +100,22 @@
         </form>
         </div>
 
-        <!-- repin -->
+        <!-- Repin -->
         <div class="tab-pane" id="repin" role="tabpanel">
           <form id="repin_form">
             <div class="offset-1 col-10">
+            
+            <div class="form-group row align-items-center">
+              <textarea class="form-control" id="board_names" name="board_names" rows="3"></textarea>
+            </div>
+            <div class="form-group row align-items-centers">
+              <div class="col-3">
+                <button id="clean_boardnames" onclick="clearTextArea('board_names');return false" class="btn btn-primary btn-sm">Очистить</button>
+              </div>
+              <div class="col-3">
+                <button id="open_boardnames" onclick="openParse('board_names');return false" class="btn btn-primary btn-sm">Выбрать файл с названиями досок</button>
+              </div>
+            </div>
 
             <div class="form-group row align-items-center">
               <div class="form-check">
@@ -111,19 +126,16 @@
                 </label>
               </div>
             </div>
-          
+
             <div class="form-group row align-items-center">
-              <textarea class="form-control" id="parsed_pins" name="parsed_pins" rows="3"></textarea>
-            </div>
-            <div class="form-group row align-items-centers">
-              <div class="col-3">
-                <button id="clean_pins" onclick="clearTextArea('parsed_pins');return false" class="btn btn-primary btn-sm">Очистить</button>
-              </div>
-              <div class="col-3">
-                <button id="open_pins" onclick="openParse('parsed_pins');return false" class="btn btn-primary btn-sm">Выбрать файл с пинами</button>
+              <div class="input-group">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" name="pin_file" id="pin_file">
+                <span class="input-group-btn">
+                  <button onclick="saveFile('pin_file')" class="btn btn-secondary btn-sm" type="button">Выбрать файл с пинами</button>
+                </span>
               </div>
             </div>
-              
+
             <div class="form-group row align-items-center">
               <label for="reg_count" class="col-form-label form-control-sm offset-1">Задержка между репинами (сек)</label>
               <div class="col-3">

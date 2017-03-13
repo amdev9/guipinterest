@@ -147,8 +147,7 @@ function fastCreateAccount(session, cb) {
   })
 }
 
-
-function apiRepin() {
+function apiRepin(task) {
   mkdirFolder(logsDir)
   .then(function() {
     var pinId = '99782947965079223';
@@ -158,7 +157,6 @@ function apiRepin() {
     .then(function(res) {
       return pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
     })
-
     // .then(function(session) {
     //   return [session, pin.Boards.add(session, 'superttt')]
     // })
@@ -176,11 +174,10 @@ function apiRepin() {
       var image_signature = res.data.image_signature;
       var closeup_user_note = res.data.closeup_user_note;
       var aggregatedpindata_id = res.data.aggregated_pin_data.id;
-
       var data = {
         'requests': "[" + JSON.stringify({
           "method": "POST",
-          "uri"   : "/v3/pins/"+ pinId +"/repin/",
+          "uri"   : "/v3/pins/" + pinId + "/repin/",
           "params": {
             "image_signature": image_signature,
             "share_twitter": "0",
@@ -296,12 +293,9 @@ function apiCreateAccounts(task) {
   })
 }
 
-
 function apiSessionCheck(user_id, username, password, proxy, token) {
  mkdirFolder(cookieDir)
   .then(function() {
-    
-
     setStateView(user_id, 'run');
     loggerDb(user_id, 'Выполняется логин');
     var cookiePath = path.join(cookieDir, user_id + ".json");
@@ -312,7 +306,6 @@ function apiSessionCheck(user_id, username, password, proxy, token) {
         updateUserStatusDb(user_id, 'Активен');
         setStateView(user_id, 'stopped');
       }).catch(function (err) {
-        
           setStateView(user_id, 'stopped');
           if (err instanceof Client.Exceptions.APIError) {
             if(err.ui) {
@@ -328,12 +321,10 @@ function apiSessionCheck(user_id, username, password, proxy, token) {
             updateUserStatusDb(user_id, 'Произошла ошибка');
             console.log(err);
           }
-
       });
   })
   .catch(function(err) {
     setStateView(user_id, 'stopped');
     console.log(err);
   })
-
 }

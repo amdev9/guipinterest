@@ -6,10 +6,6 @@ var config = require('../config/default');
 var softname = config.App.softname;
 
 document.title = "Добавление задания | " + softname 
-document.getElementById("own_emails").addEventListener("click",function(){
-  checkDisabler();
-}, false)
-checkDisabler();
 
 ipc.on('closing', () => {});
 
@@ -27,6 +23,23 @@ ipc.on('edit', (event, task) => {
     editCreateAccounts(task);
   }
 });
+
+var elements1 = ["parsed_own_emails", "clean_own_emails", "open_own_emails", "reg_count"]
+document.getElementById("own_emails").addEventListener("click", function() {
+  checkDisabler( elements1);
+}, false)
+
+
+var elements2 = ["board_names", "clean_boardnames", "open_boardnames"]
+document.getElementById("last_board").addEventListener("click", function() {
+  checkDisabler( elements2);
+}, false)
+
+function checkDisabler(elements) {
+  elements.forEach(function(item) {
+    document.getElementById(item).disabled = !document.getElementById(item).disabled;
+  })
+}
 
 function updateElementsAccessibility(type) {
   if (type == 'user') {
@@ -97,21 +110,6 @@ function saveFile(selector) {
   }
 }
 
- 
-function checkDisabler() {
-  if (document.getElementById('own_emails').checked == true) {
-    document.getElementById("parsed_own_emails").disabled = false;
-    document.getElementById("clean_own_emails").disabled = false;
-    document.getElementById("open_own_emails").disabled = false;
-    document.getElementById("reg_count").disabled = true;
-  } else {
-    document.getElementById("open_own_emails").disabled = true;
-    document.getElementById("parsed_own_emails").disabled = true;
-    document.getElementById("clean_own_emails").disabled = true;
-    document.getElementById("reg_count").disabled = false;
-  }
-}
-
 function editCreateAccounts(task) {
   $("div.container").data('task', { _id: task._id, _rev: task._rev });
   updateElemView(['create_accounts']);
@@ -121,13 +119,12 @@ function editCreateAccounts(task) {
   document.getElementById("output_file").value = task.output_file;
   if (document.getElementById("own_emails").checked) {
     document.getElementById("parsed_own_emails").value = task.email_parsed.join('\n');
+    checkDisabler(["parsed_own_emails", "clean_own_emails", "open_own_emails", "reg_count"])
   } else {
     document.getElementById("reg_count").value = task.emails_cnt;
   }
-  checkDisabler();
 }
  
-
 function createAccounts(taskName) {
   var task = {};
   var domContainer = $("div.container").data('task');
