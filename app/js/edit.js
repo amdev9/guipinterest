@@ -4,7 +4,6 @@ window.$ = window.jQuery = require('jquery');
 var config = require('../config/default');
 var softname = config.App.softname;
 
-
 document.title = "Редактирование аккаунта | " + softname
 
 ipc.on('edit', (event, user) => {
