@@ -38,7 +38,6 @@ function RequestError(payload) {
 util.inherits(RequestError, APIError);
 exports.RequestError = RequestError;
 
-
 function AuthenticationError(message) {
     this.name = "AuthenticationError";
     this.message = message || "Not possible to authenticate";
@@ -46,6 +45,14 @@ function AuthenticationError(message) {
 }
 util.inherits(AuthenticationError, APIError);
 exports.AuthenticationError = AuthenticationError;
+
+function CouldNotSaveBoard(message) {
+    this.name = "CouldNotSaveBoard";
+    this.message = message || "Could not save board";
+    this.ui = "Невозможно создать доску"
+}
+util.inherits(CouldNotSaveBoard, APIError);
+exports.CouldNotSaveBoard = CouldNotSaveBoard;
 
 function EmailNotFound(message) {
     this.name = "EmailNotFound";

@@ -150,53 +150,78 @@ function fastCreateAccount(session, cb) {
 function apiRepin(user, task) {
   mkdirFolder(logsDir)
   .then(function() {
+    // console.log(task.pin_file); 
 
-    console.log(task.pin_file); 
-    console.log(task.timeout);
-    console.log(task.board_names);
-    console.log(task.last_board);
+    var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
 
-    // var pinId = '99782947965079223';
-    // var board_id = '459859880640556506';
+    // console.log(task.timeout);
 
-    var cookiePath = path.join(cookieDir, user._id + ".json");
-    createFile(cookiePath);
+    async.forEach(pin_array, function (pinId, callback) {
+      var board_id;// = '459859880640556506';
+      var cookiePath = path.join(cookieDir, user._id + ".json");
+      createFile(cookiePath);
+      var promise = Client.Gatekeeper.experiments()
+      .then(function(res) {
+        return Client.Session.create(cookiePath, user.username, user.password, user.proxy)
+      })
+      .then(function(session) {
+        if (task.last_board) {
+          return [session, Client.Users.meBoards(session)] 
+        } else {
+          var boardName = task.board_names[Math.floor(Math.random() * task.board_names.length)];
+          return [session, Client.Boards.add(session, boardName)]
+        }
+      })
+      .spread(function(session, res) {
+        if (task.last_board) {
+          board_id = res.data[0].id; 
+        } else {
+          board_id = res.data.id
+        }
+        return [session, Client.Users.boardPickerShortlist(session, pinId)]
+      })
+      .spread(function(session, res) {
+        return [session, Client.Pins.get(session, pinId)]
+      })
+      .spread(function(session, res) {
+        var image_signature = res.data.image_signature;
+        var closeup_user_note = res.data.closeup_user_note;
+        var aggregatedpindata_id = res.data.aggregated_pin_data.id;
+        var data = {
+          'requests': "[" + JSON.stringify({
+            "method": "POST",
+            "uri"   : "/v3/pins/" + pinId + "/repin/",
+            "params": {
+              "image_signature": image_signature,
+              "share_twitter": "0",
+              "board_id": board_id,
+              "description": closeup_user_note
+            }
+          }) + "]" 
+        }
+        return [session, Client.Batch.post(session, data)]
+      })
+      .spread(function(session, res) {
+        console.log(res)
+      })
+      .catch(function(err) {
+        setStateView(user._id, 'stopped');
+        if (err instanceof Client.Exceptions.APIError) {
+          if(err.ui) {
+            updateUserStatusDb(user._id, err.ui); 
+          } else if (err.name == 'RequestCancel') {
+            
+          } else {
+            updateUserStatusDb(user._id, err.name);
+          }
+        } else if (err.message == 'stop') {
 
-    var promise = Client.Gatekeeper.experiments()
-    .then(function(res) {
-      return Client.Session.create(cookiePath, user.username, user.password, user.proxy)
+        } else {
+          updateUserStatusDb(user._id, 'Произошла ошибка');
+          console.log(err);
+        }
+      })
     })
-    .then(function(session) {
-      return [session, Client.Users.meBoards(session)] 
-
-      // return [session, Client.Boards.add(session, 'superttt')]
-    })
-    .spread(function(session, res) {
-      console.log(res)
-      // return [session, Client.Users.boardPickerShortlist(session, pinId)]
-    })
-    // .spread(function(session, res) {
-    //   return [session, Client.Pins.get(session, pinId)]
-    // })
-    // .spread(function(session, res) {
-
-    //   var image_signature = res.data.image_signature;
-    //   var closeup_user_note = res.data.closeup_user_note;
-    //   var aggregatedpindata_id = res.data.aggregated_pin_data.id;
-    //   var data = {
-    //     'requests': "[" + JSON.stringify({
-    //       "method": "POST",
-    //       "uri"   : "/v3/pins/" + pinId + "/repin/",
-    //       "params": {
-    //         "image_signature": image_signature,
-    //         "share_twitter": "0",
-    //         "board_id": board_id,
-    //         "description": closeup_user_note
-    //       }
-    //     }) + "]" 
-    //   }
-    //   return [session, pin.Batch.post(session, data)]
-    // })
   })
 }
 

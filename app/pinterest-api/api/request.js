@@ -210,6 +210,7 @@ class Request {
   errorMiddleware(response) {
     response = this.parseMiddleware(response)
     var json = response.body
+    console.log(json)
     // if (json.spam) {
     //   throw new Exceptions.ActionSpamError(json)
     // }
@@ -225,6 +226,8 @@ class Request {
       throw new Exceptions.AuthenticationError();
     else if (_.isString(json.message) && json.message.toLowerCase().indexOf('email you entered does not belong') !== -1) 
       throw new Exceptions.EmailNotFound();
+    else if (_.isString(json.message) && json.message.toLowerCase().indexOf('could not save board') !== -1) 
+      throw new Exceptions.CouldNotSaveBoard();
     throw new Exceptions.RequestError(json);
   }
 

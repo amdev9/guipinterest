@@ -14,9 +14,7 @@ ipc.on('type', (event, type, rows) => {
   saveTypeRowsDom(type, rows);
 });
 
-
 ipc.on('edit', (event, item) => {
-
   if (item.type == 'user') {
     var rows = [];
     rows.push(item._id);
@@ -30,9 +28,7 @@ ipc.on('edit', (event, item) => {
     } else if(user.task.name == 'repin') {
       editRepin(user.task)
     }
-
   } else {
-
     var rows = { _id: item._id, _rev: item._rev };
     saveTypeRowsDom('task', rows);
 
@@ -47,9 +43,6 @@ ipc.on('edit', (event, item) => {
     }
   }
 });
-
-
-
 
 var elements1 = ["parsed_own_emails", "clean_own_emails", "open_own_emails", "reg_count"]
 document.getElementById("own_emails").addEventListener("click", function() {
