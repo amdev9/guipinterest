@@ -210,7 +210,7 @@ class Request {
   errorMiddleware(response) {
     response = this.parseMiddleware(response)
     var json = response.body
-    console.log(json)
+
     // if (json.spam) {
     //   throw new Exceptions.ActionSpamError(json)
     // }

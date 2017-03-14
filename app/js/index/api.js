@@ -147,83 +147,108 @@ function fastCreateAccount(session, cb) {
   })
 }
 
+function repin(user_id, ses, task, pinId, proxy, cb) {
+  var board_id;
+  ses
+  .then(function(session) {
+    if (task.last_board) {
+      return [session, Client.Users.meBoards(session)] 
+    } else {
+      var boardName = task.board_names[Math.floor(Math.random() * task.board_names.length)];
+      return [session, Client.Boards.add(session, boardName)]
+    }
+  })
+  .spread(function(session, res) {
+    if (task.last_board) {
+      board_id = res.data[0].id; 
+    } else {
+      board_id = res.data.id
+    }
+    return [session, Client.Users.boardPickerShortlist(session, pinId)]
+  })
+  .spread(function(session, res) {
+    return [session, Client.Pins.get(session, pinId)]
+  })
+  .spread(function(session, res) {
+    var image_signature = res.data.image_signature;
+    var closeup_user_note = res.data.closeup_user_note;
+    var aggregatedpindata_id = res.data.aggregated_pin_data.id;
+    var data = {
+      'requests': "[" + JSON.stringify({
+        "method": "POST",
+        "uri"   : "/v3/pins/" + pinId + "/repin/",
+        "params": {
+          "image_signature": image_signature,
+          "share_twitter": "0",
+          "board_id": board_id,
+          "description": closeup_user_note
+        }
+      }) + "]" 
+    }
+    return [session, Client.Batch.post(session, data)]
+  })
+  .spread(function(session, res) {
+    if (res.status == 'success' && res.message == 'ok') {
+      cb(true);
+    }
+  })
+  .catch(function (err) {
+    cb(false); 
+    console.log(err);
+  });
+}
+
 function apiRepin(user, task) {
   mkdirFolder(logsDir)
   .then(function() {
-    // console.log(task.pin_file); 
-
+    setStateView(user._id, 'run');
+    var iterator = 0;
+    var filterSuccess = 0;
+    var cookiePath = path.join(cookieDir, user._id + ".json");
     var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
-
-    // console.log(task.timeout);
-
-    async.forEach(pin_array, function (pinId, callback) {
-      var board_id;// = '459859880640556506';
-      var cookiePath = path.join(cookieDir, user._id + ".json");
-      createFile(cookiePath);
-      var promise = Client.Gatekeeper.experiments()
-      .then(function(res) {
-        return Client.Session.create(cookiePath, user.username, user.password, user.proxy)
-      })
-      .then(function(session) {
-        if (task.last_board) {
-          return [session, Client.Users.meBoards(session)] 
-        } else {
-          var boardName = task.board_names[Math.floor(Math.random() * task.board_names.length)];
-          return [session, Client.Boards.add(session, boardName)]
-        }
-      })
-      .spread(function(session, res) {
-        if (task.last_board) {
-          board_id = res.data[0].id; 
-        } else {
-          board_id = res.data.id
-        }
-        return [session, Client.Users.boardPickerShortlist(session, pinId)]
-      })
-      .spread(function(session, res) {
-        return [session, Client.Pins.get(session, pinId)]
-      })
-      .spread(function(session, res) {
-        var image_signature = res.data.image_signature;
-        var closeup_user_note = res.data.closeup_user_note;
-        var aggregatedpindata_id = res.data.aggregated_pin_data.id;
-        var data = {
-          'requests': "[" + JSON.stringify({
-            "method": "POST",
-            "uri"   : "/v3/pins/" + pinId + "/repin/",
-            "params": {
-              "image_signature": image_signature,
-              "share_twitter": "0",
-              "board_id": board_id,
-              "description": closeup_user_note
-            }
-          }) + "]" 
-        }
-        return [session, Client.Batch.post(session, data)]
-      })
-      .spread(function(session, res) {
-        console.log(res)
-      })
-      .catch(function(err) {
-        setStateView(user._id, 'stopped');
-        if (err instanceof Client.Exceptions.APIError) {
-          if(err.ui) {
-            updateUserStatusDb(user._id, err.ui); 
-          } else if (err.name == 'RequestCancel') {
-            
-          } else {
-            updateUserStatusDb(user._id, err.name);
+    var ses = Client.Session.create(cookiePath, user.username, user.password, user.proxy);
+    createFile(cookiePath);
+    var promiseWhile = function(action) {
+      return new Promise(function(resolve, reject) {
+        var func = function(iterator) {
+          if (iterator) {
+            repin(user._id, ses, task, pin_array[iterator], returnProxyFunc(user.proxy), function(success) {
+              if(success) {
+                filterSuccess += 1;
+              }
+              renderUserCompletedView(user._id, pin_array.length, iterator, filterSuccess); 
+            });
           }
-        } else if (err.message == 'stop') {
-
-        } else {
-          updateUserStatusDb(user._id, 'Произошла ошибка');
-          console.log(err);
+          if (iterator >= pin_array.length || getStateView(user._id) == 'stop' || getStateView(user._id) == 'stopped' ) { // 
+            return reject(new Error("stop"));
+          }
+          return Promise.resolve(action())
+            .then(func)
+            .catch(function() {
+              reject();
+            });
         }
+        process.nextTick(func)
       })
-    })
+    }
+    promiseWhile(function() {
+      return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+          resolve(iterator);
+          iterator++;
+        }, 2000);
+      });
+    }).catch(function (err) {
+      if(err.message == 'stop') {
+        loggerDb(user._id, 'Фильтрация остановлена');
+        setStateView(user._id, 'stopped');
+      } else {
+        console.log(err.message);
+      }
+    });
   })
 }
+
 
 function apiCreateAccounts(task) {
   mkdirFolder(logsDir)
