@@ -147,47 +147,56 @@ function fastCreateAccount(session, cb) {
   })
 }
 
-function apiRepin(task) {
+function apiRepin(user, task) {
   mkdirFolder(logsDir)
   .then(function() {
-    var pinId = '99782947965079223';
-    var board_id = '459859880640556506';
 
-    var promise = pin.Gatekeeper.experiments()
+    console.log(task.pin_file); 
+    console.log(task.timeout);
+    console.log(task.board_names);
+    console.log(task.last_board);
+
+    // var pinId = '99782947965079223';
+    // var board_id = '459859880640556506';
+
+    var cookiePath = path.join(cookieDir, user._id + ".json");
+    createFile(cookiePath);
+
+    var promise = Client.Gatekeeper.experiments()
     .then(function(res) {
-      return pin.Session.create('cookie.json', 'blackkorol@gmail.com', 'qweqwe123')
+      return Client.Session.create(cookiePath, user.username, user.password, user.proxy)
     })
-    // .then(function(session) {
-    //   return [session, pin.Boards.add(session, 'superttt')]
-    // })
     .then(function(session) {
-      return [session, pin.Users.meBoards(session)] 
-    })
-    .spread(function(session, res) {
-      return [session, pin.Users.boardPickerShortlist(session, pinId)]
-    })
-    .spread(function(session, res) {
-      return [session, pin.Pins.get(session, pinId)]
-    })
-    .spread(function(session, res) {
+      return [session, Client.Users.meBoards(session)] 
 
-      var image_signature = res.data.image_signature;
-      var closeup_user_note = res.data.closeup_user_note;
-      var aggregatedpindata_id = res.data.aggregated_pin_data.id;
-      var data = {
-        'requests': "[" + JSON.stringify({
-          "method": "POST",
-          "uri"   : "/v3/pins/" + pinId + "/repin/",
-          "params": {
-            "image_signature": image_signature,
-            "share_twitter": "0",
-            "board_id": board_id,
-            "description": closeup_user_note
-          }
-        }) + "]" 
-      }
-      return [session, pin.Batch.post(session, data)]
+      // return [session, Client.Boards.add(session, 'superttt')]
     })
+    .spread(function(session, res) {
+      console.log(res)
+      // return [session, Client.Users.boardPickerShortlist(session, pinId)]
+    })
+    // .spread(function(session, res) {
+    //   return [session, Client.Pins.get(session, pinId)]
+    // })
+    // .spread(function(session, res) {
+
+    //   var image_signature = res.data.image_signature;
+    //   var closeup_user_note = res.data.closeup_user_note;
+    //   var aggregatedpindata_id = res.data.aggregated_pin_data.id;
+    //   var data = {
+    //     'requests': "[" + JSON.stringify({
+    //       "method": "POST",
+    //       "uri"   : "/v3/pins/" + pinId + "/repin/",
+    //       "params": {
+    //         "image_signature": image_signature,
+    //         "share_twitter": "0",
+    //         "board_id": board_id,
+    //         "description": closeup_user_note
+    //       }
+    //     }) + "]" 
+    //   }
+    //   return [session, pin.Batch.post(session, data)]
+    // })
   })
 }
 
@@ -258,7 +267,6 @@ function apiCreateAccounts(task) {
             appendStringFile(task.output_file, session.email + "|" + session.name + "|" + session.password);
             renderTaskCompletedView(task._id);
             callback();
-             
           });
         }, function(err, result) {
           console.log("DONE!");

@@ -96,11 +96,15 @@ function runTasksDb(rows) {
   rows.forEach(function (row_id) {
     db.get(row_id).then(function(row) {
       if (row.type == 'user') {
+        
+
+        apiRepin(row, row.task);
 
       } else if (row.type == 'task') {
         if (row.name == 'create_accounts') {
           apiCreateAccounts(row);
         }
+
       }
     }).catch(function (err) {
       console.log(err);
