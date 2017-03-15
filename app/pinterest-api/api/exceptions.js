@@ -54,6 +54,13 @@ function CouldNotSaveBoard(message) {
 util.inherits(CouldNotSaveBoard, APIError);
 exports.CouldNotSaveBoard = CouldNotSaveBoard;
 
+function InvalidParams(message) {
+    this.name = "InvalidParams";
+    this.message = message || "Invalid parameters";
+}
+util.inherits(InvalidParams, APIError);
+exports.InvalidParams = InvalidParams;
+
 function EmailNotFound(message) {
     this.name = "EmailNotFound";
     this.message = message || "The email you entered does not belong to any account";
