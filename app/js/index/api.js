@@ -193,7 +193,7 @@ function repin(user_id, ses, task, pinId, proxy, cb) {
     }
   })
   .catch(function (err) {
-    if (err.name == 'CouldNotSaveBoard') {
+    if (err instanceof Client.Exceptions.APIError && err.name != 'NotFoundError') {
       console.log('cb', 'CouldNotSaveBoard')
       cb(err);
     } else {
@@ -215,20 +215,22 @@ function apiRepin(user, task) {
     var promiseWhile = function(action) {
       return new Promise(function(resolve, reject) {
         var func = function(iterator) {
+          if (iterator > pin_array.length || getStateView(user._id) == 'stop' || getStateView(user._id) == 'stopped' ) {
+            return reject(new Error("stop"));
+          }
+
           if (iterator) {
             repin(user._id, ses, task, pin_array[iterator], returnProxyFunc(user.proxy), function(success) {
               if(success === true) {
                 filterSuccess += 1;
-              } else if (success.name == 'CouldNotSaveBoard') {
+              } else if (success instanceof Client.Exceptions.APIError) {
                 console.log('succ', success.name)
                 return reject(new Error("stop"));
               }
               renderUserCompletedView(user._id, pin_array.length, iterator, filterSuccess); 
             });
           }
-          if (iterator >= pin_array.length || getStateView(user._id) == 'stop' || getStateView(user._id) == 'stopped' ) {
-            return reject(new Error("stop"));
-          }
+          
           return Promise.resolve(action())
           .then(func)
           .catch(function() {
