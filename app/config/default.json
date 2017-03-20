@@ -1,9 +1,8 @@
 {
   "App": {
     "softname": "PinMaker PRO",
-    "devTools": true,
-    "hostname": "pinmaster.mailglobals.co",
-    "dbname": "pinlevdb"
+    "devTools": false,
+    "hostname": "pinmaster.mailglobals.co"
   }
 }
 
