@@ -8,6 +8,10 @@ var Promise = require('bluebird')
 var Registry = require('winreg')
 const crypto = require('crypto')
 var config = require('./config/default')
+
+
+var unique = require('node-machine-id');
+var machineId = unique.machineId, machineIdSync = unique.machineIdSync;
 var host = config.App.hostname
 
 function checkLicense(cb) {
@@ -31,6 +35,14 @@ function checkLicense(cb) {
 
   } else if (process.platform == 'darwin') {
     cb('ok')
+    // var obj = {};
+    // obj['memUserDir'] = memUserDir(); 
+    // obj['DiskEnum'] = os.cpus()[0].model; // os.cpus()[0].speed
+    // obj['BIOSVersion'] = machineIdSync({original: true});
+    // obj['BaseBoardManufacturer'] = '-';  
+    // obj['BIOSVendor'] = os.hostname(); 
+    // obj['SystemManufacturer'] = os.platform();
+    
     // var sendData = memUserDir()+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"]+
     //   "|"+obj["BIOSVendor"]+"|"+obj["SystemManufacturer"]+"|"+obj["BaseBoardManufacturer"];
     // var serialKey = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"];
