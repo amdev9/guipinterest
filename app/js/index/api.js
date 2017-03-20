@@ -310,9 +310,11 @@ function apiCreateAccounts(task) {
       var func = function(results) {
         
         async.mapValues(_.object(email_tuple[i], proxy_array), function (proxy, email, callback) {
-          if(config.App.devTools == false) {
-            setProxyFunc(proxy); ////////////// ???????
-          }
+          // if(config.App.devTools == false) {
+          
+          console.log(returnProxyFunc(proxy))
+          // }
+
           var storage = path.join(cookieDir, email + '.json')
           fs.closeSync(fs.openSync(storage, 'w') );
           var session = new Session(storage);
@@ -322,9 +324,10 @@ function apiCreateAccounts(task) {
           session.setName(name);
           session.setEmail(email);
           session.setPassword(password);
+          session.setProxy(returnProxyFunc(proxy)); 
 
           fastCreateAccount(session, function(session) {
-            appendStringFile(task.output_file, session.email + "|" + session.password + "|"); //  + session.name 
+            appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
             renderTaskCompletedView(task._id);
             callback();
           });

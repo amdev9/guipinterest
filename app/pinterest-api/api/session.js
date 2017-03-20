@@ -42,6 +42,11 @@ class Session {
     this._proxyUrl = val;
   }
 
+  setProxy(proxy) {
+    this._proxyUrl = proxy;
+    return this;
+  }
+
   setName(name) {
     this._name = name;
     return this;
