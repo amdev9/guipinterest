@@ -7,6 +7,13 @@
 window.$ = window.jQuery = require('jquery');
 var config = require('./config/default');
 var softname = config.App.softname;
+const shell = require('electron').shell;
+
+$('.open-in-browser').click((event) => {
+  event.preventDefault();
+  shell.openExternal(event.target.href);
+});
+
 
 $(document).ready(function () {
   $('#navbarBrand').text(softname)
@@ -14,18 +21,6 @@ $(document).ready(function () {
   $('#memberLicense').html(`<small>Спасибо за использование ${softname}</small>`)
   checkSecurityController(setModalStatus);
 });
- 
-function setModalStatus(result) {
-  if(result == 'ok') {
-    $('#memberModal').modal('hide');
-  } else if (result == 'fail') {
-    $("#memberModalBody").text("Проверьте подключение к интернету и наличие лицензии")
-  } else if (result == 'vm') {
-    $("#memberModalBody").text("Виртуальные машины не поддерживаются") 
-  } else {
-    $("#memberModalBody").text("Ошибка проверки лицензии") 
-  }
-}
 
 function proxyView(proxyString) {
   if (proxyString.split(":").length == 2) {
@@ -39,8 +34,21 @@ function proxyView(proxyString) {
   }
 }
 
+
+function setModalStatus(result) {
+  if(result == 'ok') {
+    $('#memberModal').modal('hide');
+  } else if (result == 'fail') {
+    $("#memberModalBody").html("<p>Проверьте подключение к интернету и наличие лицензии</p> <p><small>E-mail разработчика: </small><b>support@mailglobals.co</b></p>")
+  } else if (result == 'vm') {
+    $("#memberModalBody").text("Виртуальные машины не поддерживаются") 
+  } else {
+    $("#memberModalBody").text("Ошибка проверки лицензии") 
+  }
+}
+
 function showLicenseTokenView(token) {
-  $("#memberLicense > p").text("Лицензионный ключ: " + token + "")
+  $("#memberLicense").html(`<small>Лицензионный ключ: <b>${token}</b></small>`)
 }
 
 $(function() {
@@ -103,7 +111,6 @@ function setStateView(id, state) {
 
 function taskRenderNames(taskDbName) {
   switch(taskDbName) {
-    case 'repin': return 'Репины'
     case 'filtration': return 'Фильтрация'
     case 'parse_concurrents': return 'Парсинг по конкурентам'
     case 'create_accounts': return 'Регистрация аккаунтов'
@@ -129,8 +136,11 @@ function setStatusView(id, status) {
 
 function addStopStateView(rows_ids) {
   rows_ids.forEach( function(row_id) {
+    
     var t = tokens.get(row_id);
-    t.cancel();
+    if (typeof t.cancel !== "undefined") { 
+      t.cancel();
+    }
     var state = getStateView(row_id);
     if (state != 'stopped') {
       setStateView(row_id, 'stop');
@@ -146,13 +156,13 @@ function deleteRowsView(rows) {
 
 function userRowRenderView(user_id) {
   db.get(user_id).then(function(user) {  
-    setUsernameView(user._id, user.username);
+    setUsernameView(user._id, user.username)
     var proxy_s = proxyView(user.proxy)
-    setProxyView(user._id, proxy_s);
-    setStatusView(user._id, user.status);    
+    setProxyView(user._id, proxy_s)
+    setStatusView(user._id, user.status)   
   }).catch(function (err) {
-    console.log(err);
-  });
+    console.log(err)
+  })
 }
 
 function renderNewTaskCompletedView(user_id) {
@@ -216,16 +226,16 @@ function renderUserRowView(users) {
 function initUserRowRenderView(users) {
   var usersHtml = "";
   users.forEach(function(user) {
-    var proxy_s = proxyView(user.doc.proxy)
-    var taskName = taskRenderNames(user.doc.task.name)
+    var taskName = taskRenderNames(user.doc.task.name);
+    var proxy_s = proxyView(user.doc.proxy) 
     var oneUserHtml = `<tr data-id="${user.doc._id}" state="stopped" class="table-sm">
       <td>${user.doc.username}</td>
       <td>${proxy_s}</td>
       <td>${taskName}</td>
       <td>Остановлен</td>
       <td>-</td>
-      <td>${user.doc.status}</td></tr>`
-    usersHtml += oneUserHtml
-  })
-  $('#table1').append(usersHtml)
+      <td>${user.doc.status}</td></tr>`;
+    usersHtml += oneUserHtml;
+  });
+  $('#table1').append(usersHtml);
 }

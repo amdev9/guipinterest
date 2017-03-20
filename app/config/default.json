@@ -2,7 +2,7 @@
   "App": {
     "softname": "PinMaker PRO",
     "devTools": true,
-    "hostname": "calm-beyond-91310.herokuapp.com",
+    "hostname": "pinmaster.mailglobals.co",
     "dbname": "pinlevdb"
   }
 }

@@ -15,7 +15,6 @@ const devIsOpen = config.App.devTools
 var softname = config.App.softname
 var logsDir = path.join(os.tmpdir(), softname, 'logs')
 
-
 document.title = softname
 var logControls = [];
 
@@ -68,7 +67,7 @@ function openDevTool(win, isOpen) {
   }
 }
 
-function editUserController(user) { 
+function editUserController(user) {
   if (user.length == 0) {
     dialog.showMessageBox({ 
       message: "Пользователь не выбран",
@@ -94,13 +93,12 @@ function editUserController(user) {
       editView.webContents.send('closing');
       return false;
     }
-    
+
     editView.webContents.on('did-finish-load', () => {
       getItemDb(user[0], editView.webContents ); 
     });
     openDevTool(editView, devIsOpen);
   }
-
 }
 
 function tasksController(action, rows) {

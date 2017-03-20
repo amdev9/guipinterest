@@ -13,46 +13,38 @@ var host = config.App.hostname
 function checkLicense(cb) {
   if (process.platform == 'win32') {
 
-    new Promise(function(resolve, reject) {
-      networkInt((res) => {
-        if(res == "vm") {
-          cb('vm');
-        }
+    virtualCheck(cb)
+      .then(function(res) {
+        console.log(res)
+        bios(function(obj) {
+
+          var sendData = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"]+
+            "|"+obj["BIOSVendor"]+"|"+obj["SystemManufacturer"]+"|"+obj["BaseBoardManufacturer"];
+          var serialKey = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"];
+          makePost(sendData, serialKey, cb);
+
+        });
       })
-    })
-    .then(function() {
-      taskList((res) => {
-        if(res == "vm") {
-          cb('vm');
-        } 
+      .catch(function(err) {
+        cb('vm');
       })
-    })
-    .then(function() {
-      openWin((res) => {
-        if(res == "vm") {
-          cb('vm');
-        }
-      })
-    })
-    .then(function() {
-      bios(function(obj) {
-        var sendData = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"]+
-          "|"+obj["BIOSVendor"]+"|"+obj["SystemManufacturer"]+"|"+obj["BaseBoardManufacturer"];
-        var serialKey = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"];
-        makePost(sendData, serialKey, cb);
-      });
-    })
+
+  } else if (process.platform == 'darwin') {
+    cb('ok')
+    // var sendData = memUserDir()+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"]+
+    //   "|"+obj["BIOSVendor"]+"|"+obj["SystemManufacturer"]+"|"+obj["BaseBoardManufacturer"];
+    // var serialKey = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"];
+    // makePost(sendData, serialKey, cb);
+      
   } else {
-    // setTimeout( () => {
-      cb('ok')
-    // }, 2000)
+    cb('fail')
   }
 }
 
 function makePost(sendData, serialKey, cb) {
   var options = {
     hostname: host,
-    port: 5014,
+    port: 80,
     path: '/api/uploader',
     method: 'POST',
     headers: {
@@ -98,7 +90,32 @@ function makePost(sendData, serialKey, cb) {
 //// WINDOWS APP SECURITY ////
 //////////////////////////////
 
-function bios(cb) {
+function virtualCheck(cb) {
+  return new Promise(function(resolve, reject) {
+    
+    openWin(function(res) { // FIX find resolve point 
+      if(res == 'vm') {
+        reject(res);
+      }
+    });
+    networkInt(function(res) {
+      if(res == 'vm') {
+        reject(res);
+      } else {
+        taskList(function(res) {
+          if(res == 'vm') {
+            reject(res);
+          } else {
+            resolve(res);
+          }
+        });
+      }
+    });
+
+  })
+}
+
+function diskEnum(cb) {
   regKeyDisk = new Registry({                                       
     hive: Registry.HKLM,                                       
     key: '\\SYSTEM\\CurrentControlSet\\services\\Disk\\Enum'
@@ -109,30 +126,70 @@ function bios(cb) {
   else
     for (var i = 0; i < items.length; i++) {
       if (items[i].name == '0') {
-        var obj = {};
-        obj['DiskEnum'] = items[i].value;
-        obj['memUserDir'] = os.totalmem() + '|' + os.userInfo().username + "|" + os.userInfo().homedir;
-
-        regKeyBIOS = new Registry({                                       
-          hive: Registry.HKLM,                                       
-          key: '\\HARDWARE\\DESCRIPTION\\System\\BIOS'
-        })
-        regKeyBIOS.values(function (err, items ) {
-        if (err)
-          console.log('ERROR: ' + err);
-        else
-          for (var i = 0; i < items.length; i++) {
-            if (items[i].name == 'BaseBoardManufacturer' || items[i].name == 'BIOSVendor' || items[i].name == 'SystemManufacturer' || items[i].name == 'BIOSVersion') {
-              obj[items[i].name] = items[i].value;
-            }
-            if (i == (items.length-1)) {
-              cb(obj);
-            }
-          }
-        }); 
-
+        cb(items[i].value);
       }
     }
+  });
+}
+
+function regParams(cb) {
+  regKeyBIOS = new Registry({                                       
+    hive: Registry.HKLM,                                       
+    key: '\\HARDWARE\\DESCRIPTION\\System\\BIOS'
+  })
+  regKeyBIOS.values(function (err, items ) {
+    if (err) {
+      console.log('ERROR: ' + err);
+    } else {
+      cb(items)
+    }
+  });
+ 
+}
+
+function memUserDir() {
+  return os.totalmem() + '|' + os.userInfo().username + "|" + os.userInfo().homedir;
+}
+
+function bios(cb) {
+  var obj = {};
+  obj['memUserDir'] = memUserDir();
+  diskEnum(function(val) {
+    obj['DiskEnum'] = val;
+    regParams(function(items) {
+
+      if (items.length == 0) { 
+        obj['BaseBoardManufacturer'] = '-';
+        obj['BIOSVendor'] = '-';
+        obj['SystemManufacturer'] = '-';
+        obj['BIOSVersion'] = '-';
+        cb(obj); 
+      }
+
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].name == 'BaseBoardManufacturer') {
+          obj['BaseBoardManufacturer'] = items[i].value;
+        } else if (items[i].name == 'BIOSVendor') {
+          obj['BIOSVendor'] = items[i].value;
+        } else if (items[i].name == 'SystemManufacturer') {
+          obj['SystemManufacturer'] = items[i].value;
+        } else if (items[i].name == 'BIOSVersion') {
+          obj['BIOSVersion'] = items[i].value;
+        }
+        if (i == (items.length - 1)) {
+          if (!obj['BaseBoardManufacturer']) {
+            obj['BaseBoardManufacturer'] = '-';
+          } else if(!obj['BIOSVendor']) {
+            obj['BIOSVendor'] = '-';
+          } else if(!obj['SystemManufacturer']) {
+            obj['SystemManufacturer'] = '-';
+          } else if(!obj['BIOSVersion']) {
+            obj['BIOSVersion'] = '-';
+          }
+          cb(obj);
+        }
+      } 
+    });
   });
 }
  
@@ -155,16 +212,20 @@ function taskList(erback) {
     'Workstation',
     'vmtoolsd.exe' ];
   exec('tasklist', function(err, stdout, stderr) {
-    vm_task_arr.forEach( function (item) {
+    vm_task_arr.forEach( function (item, i, arr) {
       if (stdout.indexOf(item) > 0) {
-        erback("vm");
+        erback('vm')
+      }  
+      if (i == arr.length - 1 ) {
+        erback('ok')
       }
     });
   });
 }
 
-function networkInt(erback) {
-  for(var key in os.networkInterfaces()) {
+function networkInt(erback) { // on last key resolve
+  var key;
+  for(key in os.networkInterfaces()) {
     var vm_mac_arr = [
       '00:05:69', '00:0c:29', '00:1c:14', '00:50:56',   // VMware (VMware Workstation)
       '00:03:ff', '00:0d:3a', '00:50:f2', '7c:1e:52', 
@@ -175,25 +236,29 @@ function networkInt(erback) {
                                           '00:1c:42'];  // Parallels (Parallels Workstation)
     if(vm_mac_arr.indexOf(os.networkInterfaces()[key][0].mac.substring(0,8) ) > 0 ) {
       erback("vm");
-    }
+    }  
+  }
+  if (key !== undefined) { // There was at least one element
+    erback("ok"); 
   }
 }
 
-function openWin(erback) {
+function openWin(erback) { // resolve add
   var vm_open = [
     'VBoxTrayToolWndClass', 
     'CPInterceptor',  
     'DesktopUtilites', 
     'VMSwitchUserControlClass', 
     'prl.tools.auxwnd', 
-    '0843FD01-1D28-44a3-B11D-E3A93A85EA96'];
+    '0843FD01-1D28-44a3-B11D-E3A93A85EA96'
+  ];
   var ref = require('ref');
   var ffi = require('ffi');
   var voidPtr = ref.refType(ref.types.void);
   var stringPtr = ref.refType(ref.types.CString);
   var user32 = ffi.Library('user32.dll', {
-      EnumWindows: ['bool', [voidPtr, 'int32']],
-      GetWindowTextA : ['long', ['long', stringPtr, 'long']]
+    EnumWindows: ['bool', [voidPtr, 'int32']],
+    GetWindowTextA: ['long', ['long', stringPtr, 'long']]
   });
   windowProc = ffi.Callback('bool', ['long', 'int32'], function(hwnd, lParam) {
     var buf, name, ret;
@@ -201,7 +266,7 @@ function openWin(erback) {
     ret = user32.GetWindowTextA(hwnd, buf, 255);
     name = ref.readCString(buf, 0);
     if (vm_open.indexOf(name) > 0) {
-      erback("vm");
+      erback('vm');
     }
     return true;
   });

@@ -324,7 +324,7 @@ function apiCreateAccounts(task) {
           session.setPassword(password);
 
           fastCreateAccount(session, function(session) {
-            appendStringFile(task.output_file, session.email + "|" + session.name + "|" + session.password);
+            appendStringFile(task.output_file, session.email + "|" + session.password + "|"); //  + session.name 
             renderTaskCompletedView(task._id);
             callback();
           });

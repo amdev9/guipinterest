@@ -5,8 +5,8 @@ const path = require('path')
 const url = require('url')
 var config = require('./config/default')
 const devIsOpen = config.App.devTools
+const host = config.App.hostname
 const os = require('os')
-
 
 let template = []
 const name = app.getName()
@@ -85,10 +85,12 @@ app.on('window-all-closed', function() {
 
 app.on('ready', function() {
   let platform = 'win'
-  let url = `http://192.168.1.33:5014/update/${platform}_${os.arch()}/${app.getVersion()}`
   if (process.platform === 'darwin') {
     platform = 'osx'
   }
+  let url = `http://${host}/update/${platform}_${os.arch()}/${app.getVersion()}`
+  console.log(url)
+  
   if (platform == 'osx') {
     autoUpdater.setFeedURL(url)
   } else if (platform == 'win') {
@@ -117,8 +119,9 @@ autoUpdater.on('checking-for-update', () => {})
 autoUpdater.on('update-available', (ev, info) => {})
 autoUpdater.on('update-not-available', (ev, info) => {})
 autoUpdater.on('error', (ev, err) => {
-  if(!devIsOpen)
-    dialog.showErrorBox('Ошибка обновления', 'Произошла ошибка при обновлении программы')
+  console.log(err)
+  // if(!devIsOpen)
+  dialog.showErrorBox('Ошибка обновления', 'Произошла ошибка при обновлении программы')
 })
 autoUpdater.on('download-progress', (ev, progressObj) => {})
 
