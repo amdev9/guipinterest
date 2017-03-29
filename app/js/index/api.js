@@ -13,7 +13,7 @@ var config = require('./config/default');
 var softname = config.App.softname;
 var _ = require('lodash');
 
-var cookieDir = path.join(os.tmpdir(), softname, 'cookie');
+var cookieDir = path.join(os.tmpdir(), softname.replace(/\s/g,'') , 'cookie');
 
 
 function fullCreateAccount(session, cb) {
@@ -210,8 +210,9 @@ function apiRepin(user, task) {
     var filterSuccess = 0;
     var cookiePath = path.join(cookieDir, user._id + ".json");
     var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
+
     var ses = Client.Session.create(cookiePath, user.username, user.password, user.proxy);
-    createFile(cookiePath);
+    fs.closeSync(fs.openSync(cookiePath, 'w')); // createFile(cookiePath);
     var promiseWhile = function(action) {
       return new Promise(function(resolve, reject) {
         var func = function(iterator) {
@@ -370,7 +371,7 @@ function apiSessionCheck(user_id, username, password, proxy, token) {
     setStateView(user_id, 'run');
     loggerDb(user_id, 'Выполняется логин');
     var cookiePath = path.join(cookieDir, user_id + ".json");
-    createFile(cookiePath);
+    fs.closeSync(fs.openSync(cookiePath, 'w')); // createFile(cookiePath);
     Client.Request.setToken(token)
     Client.Session.create(cookiePath, username, password, returnProxyFunc(proxy) ) // check for created file
       .then(function (session) {
