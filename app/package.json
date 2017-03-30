@@ -1,10 +1,10 @@
 {
   "name": "guipinterest",
   "private": true,
-  "productName": "PinMaker PRO",
+  "productName": "PinMakerPRO",
   "version": "0.0.1",
-  "description": "GUI pinterest app",
-  "author": "AlexSoft <alexpro@mail.gnu>",
+  "description": "PinMakerPRO - продвижение в Pinterest",
+  "author": "SocialDev <support@mailglobals.co>",
   "main": "main.js",
   "scripts": {
     "postinstall": "electron-rebuild -p",
