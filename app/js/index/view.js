@@ -111,6 +111,7 @@ function setStateView(id, state) {
 
 function taskRenderNames(taskDbName) {
   switch(taskDbName) {
+    case 'repin': return 'Репины'
     case 'filtration': return 'Фильтрация'
     case 'parse_concurrents': return 'Парсинг по конкурентам'
     case 'create_accounts': return 'Регистрация аккаунтов'

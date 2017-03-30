@@ -42,6 +42,7 @@ function dropDb() {
 
 function addTaskDb(tasks, users) { 
   if (users) {
+    console.log(tasks, users)
     usersTaskDb(tasks, users);
   } else {
     var task = tasks;
@@ -211,6 +212,7 @@ function updateUserStatusDb(user_id, statusValue) {
 
 function usersTaskDb(tasks, users) {
   users.forEach(function(user_id, i) {
+    
     db.get(user_id).then(function(user) {
       user.task = tasks[i];
       db.put(user).then(function(result) {
