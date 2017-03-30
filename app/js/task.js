@@ -150,7 +150,7 @@ function createAccounts(taskName) {
     task._id = domContainer._id;
     task._rev = domContainer._rev;
   } else {
-    task._id = new Date().toISOString().replace(".", "");
+    task._id = new Date().toISOString().replace(".", "").replace(":", "");
   }
   task.status = '-';
   task.name = taskName;
