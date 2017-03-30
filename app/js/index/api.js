@@ -12,8 +12,8 @@ var async = require('async');
 var config = require('./config/default');
 var softname = config.App.softname;
 var _ = require('lodash');
-
-var cookieDir = path.join(os.tmpdir(), softname.replace(/\s/g,'') , 'cookie');
+var softDir = softname.replace(" ", "");
+var cookieDir = path.join(os.tmpdir(), softDir , 'cookie');
 
 
 function fullCreateAccount(session, cb) {

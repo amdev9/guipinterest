@@ -12,9 +12,9 @@ var path = require('path');
 const os = require('os');
 var config = require('./config/default');
 var softname = config.App.softname;
- 
-var levelPath = path.join(os.tmpdir(), softname.replace(/\s/g,''), 'levdb');
-var logsDir = path.join(os.tmpdir(), softname.replace(/\s/g,''), 'logs');
+var softDir = softname.replace(" ", "");
+var levelPath = path.join(os.tmpdir(), softDir , 'levdb');
+var logsDir = path.join(os.tmpdir(), softDir, 'logs');
 var db;
 var tokens = new Map();
 
