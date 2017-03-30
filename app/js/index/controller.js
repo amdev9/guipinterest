@@ -13,7 +13,9 @@ const ipcRenderer = require('electron').ipcRenderer
 var config = require('./config/default')
 const devIsOpen = config.App.devTools
 var softname = config.App.softname
-var logsDir = path.join(os.tmpdir(), softname, 'logs')
+var softDir = softname.replace(" ", "");
+
+var logsDir = path.join(os.tmpdir(), softDir, 'logs')
 
 document.title = softname
 var logControls = [];
