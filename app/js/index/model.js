@@ -162,15 +162,15 @@ function loggerDb(user_id, logString) {
   mkdirFolder(logsDir)
     .then(function() {
       var dateTimeTxt = getTimeStamp();
+      var l_filepath = path.join(logsDir, user_id + ".txt");
       db.get(user_id).then(function(user) { // do we need this hah???
         if (user.username) {
           var l_string = dateTimeTxt + user.username + ": " + logString;
         } else {
           var l_string = dateTimeTxt + user.name + ": " + logString;
         }
-        var l_filepath = path.join(logsDir, user._id + ".txt");
-        console.log(l_filepath)
-        fs.writeFile(l_filepath, 'test', (err) => {
+        
+        fs.writeFile(l_filepath, '', (err) => {
           if (err) throw err;  
         
           emitLoggerMessage(user._id, l_string);  // emit message to opened views  FIX 
