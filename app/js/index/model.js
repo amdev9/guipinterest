@@ -163,6 +163,7 @@ function loggerDb(user_id, logString) {
     .then(function() {
       var dateTimeTxt = getTimeStamp();
       var l_filepath = path.join(logsDir, user_id + ".txt");
+      fs.closeSync(fs.openSync(l_filepath, 'w'));
       db.get(user_id).then(function(user) { // do we need this hah???
         if (user.username) {
           var l_string = dateTimeTxt + user.username + ": " + logString;
@@ -170,12 +171,10 @@ function loggerDb(user_id, logString) {
           var l_string = dateTimeTxt + user.name + ": " + logString;
         }
         
-        fs.writeFile(l_filepath, '', (err) => {
-          if (err) throw err;  
         
-          emitLoggerMessage(user._id, l_string);  // emit message to opened views  FIX 
-          appendStringFile(l_filepath, l_string);
-        });
+        emitLoggerMessage(user._id, l_string);  // emit message to opened views  FIX 
+        appendStringFile(l_filepath, l_string);
+       
       }).catch(function (err) {
         console.log(err);
       });
