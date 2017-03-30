@@ -115,38 +115,40 @@ function openDevTool(win, isOpen) {
   }
 }
 
-autoUpdater.on('checking-for-update', () => {})
-autoUpdater.on('update-available', (ev, info) => {})
-autoUpdater.on('update-not-available', (ev, info) => {})
-autoUpdater.on('error', (ev, err) => {
-  console.log(err)
-  // if(!devIsOpen)
-  dialog.showErrorBox('Ошибка обновления', 'Произошла ошибка при обновлении программы')
-})
-autoUpdater.on('download-progress', (ev, progressObj) => {})
-
-autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-  let message = 'Доступно обновление ' + app.getName() + ' ' + releaseName + '. Оно будет установлено при следующем запуске программы.'
-  if (releaseNotes) {
-    const splitNotes = releaseNotes.split(/[^\r]\n/)
-    message += '\n\nОписание обновления:\n'
-    splitNotes.forEach(notes => {
-      message += notes + '\n\n'
-    })
-  }
-  dialog.showMessageBox({
-    type: 'question',
-    buttons: ['Установить и перезапустить', 'Позже'],
-    defaultId: 0,
-    message: 'Обновление ' + app.getName() + ' было загружено',
-    detail: message
-  }, response => {
-    if (response === 0) {
-      setTimeout(() => autoUpdater.quitAndInstall(), 1)
-    }
+if (process.platform === 'darwin') {
+  autoUpdater.on('checking-for-update', () => {})
+  autoUpdater.on('update-available', (ev, info) => {})
+  autoUpdater.on('update-not-available', (ev, info) => {})
+  autoUpdater.on('error', (ev, err) => {
+    console.log(err)
+    // if(!devIsOpen)
+    dialog.showErrorBox('Ошибка обновления', 'Произошла ошибка при обновлении программы')
   })
-})
+  autoUpdater.on('download-progress', (ev, progressObj) => {})
 
-setTimeout(function() {
-  autoUpdater.checkForUpdates()
-}, 1000)
+  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    let message = 'Доступно обновление ' + app.getName() + ' ' + releaseName + '. Оно будет установлено при следующем запуске программы.'
+    if (releaseNotes) {
+      const splitNotes = releaseNotes.split(/[^\r]\n/)
+      message += '\n\nОписание обновления:\n'
+      splitNotes.forEach(notes => {
+        message += notes + '\n\n'
+      })
+    }
+    dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Установить и перезапустить', 'Позже'],
+      defaultId: 0,
+      message: 'Обновление ' + app.getName() + ' было загружено',
+      detail: message
+    }, response => {
+      if (response === 0) {
+        setTimeout(() => autoUpdater.quitAndInstall(), 1)
+      }
+    })
+  })
+
+  setTimeout(function() {
+    autoUpdater.checkForUpdates()
+  }, 1000)
+}
