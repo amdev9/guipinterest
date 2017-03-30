@@ -266,6 +266,9 @@ function apiRepin(user, task) {
 function apiCreateAccounts(task) {
   mkdirFolder(logsDir)
   .then(function() {
+    mkdirFolder(cookieDir)
+  })
+  .then(function() {
     
     setStateView(task._id, 'run');
     loggerDb(task._id, 'Регистрация аккаунтов');
@@ -313,27 +316,29 @@ function apiCreateAccounts(task) {
       var func = function(results) {
         
         async.mapValues(_.object(email_tuple[i], proxy_array), function (proxy, email, callback) {
-          // if(config.App.devTools == false) {
-          
-          console.log(returnProxyFunc(proxy))
-          // }
+
 
           var storage = path.join(cookieDir, email + '.json')
-          fs.closeSync(fs.openSync(storage, 'w') );
-          var session = new Session(storage);
-          var password = generatePassword(); 
-          var name = email.split("@")[0];
 
-          session.setName(name);
-          session.setEmail(email);
-          session.setPassword(password);
-          // session.setProxy(returnProxyFunc(proxy));  // FIX
+          fs.appendFile(storage, '', (err) => {
+            if (err) throw err;
 
-          fastCreateAccount(session, function(session) {
-            appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
-            renderTaskCompletedView(task._id);
-            callback();
-          });
+            var session = new Session(storage, returnProxyFunc(proxy));
+            var password = generatePassword(); 
+            var name = email.split("@")[0];
+
+            session.setName(name);
+            session.setEmail(email);
+            session.setPassword(password);
+   
+
+            fastCreateAccount(session, function(session) {
+              appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
+              renderTaskCompletedView(task._id);
+              callback();
+            });
+
+          })
         }, function(err, result) {
           console.log("DONE!");
         });

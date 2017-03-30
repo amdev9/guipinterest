@@ -102,18 +102,6 @@ function appendStringFile(filepath, string) {
   });
 }
 
-function createFile(filename) {
-  fs.open(filename,'r', function(err, fd) {
-    if (err) {
-      fs.writeFile(filename, '', function(err) {
-        if(err) {
-          console.log(err);
-        }
-      });
-    }
-  });
-}
-
 function isEmpty(x) {
   if( x !== "" ) {
     return true;

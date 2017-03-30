@@ -13,8 +13,8 @@ const os = require('os');
 var config = require('./config/default');
 var softname = config.App.softname;
  
-var levelPath = path.join(os.tmpdir(), softname, 'levdb');
-var logsDir = path.join(os.tmpdir(), softname, 'logs');
+var levelPath = path.join(os.tmpdir(), softname.replace(/\s/g,''), 'levdb');
+var logsDir = path.join(os.tmpdir(), softname.replace(/\s/g,''), 'logs');
 var db;
 var tokens = new Map();
 
@@ -167,9 +167,13 @@ function loggerDb(user_id, logString) {
           var l_string = dateTimeTxt + user.name + ": " + logString;
         }
         var l_filepath = path.join(logsDir, user._id + ".txt");
-        createFile(l_filepath);
-        emitLoggerMessage(user._id, l_string);  // emit message to opened views  FIX 
-        appendStringFile(l_filepath, l_string);
+        
+        fs.appendFile(l_filepath, '', (err) => {
+          if (err) throw err;  
+        
+          emitLoggerMessage(user._id, l_string);  // emit message to opened views  FIX 
+          appendStringFile(l_filepath, l_string);
+        });
       }).catch(function (err) {
         console.log(err);
       });
