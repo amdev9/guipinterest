@@ -135,9 +135,11 @@ function fullCreateAccount(session, cb) {
 }
 
 function fastCreateAccount(session, cb) {
+
   Client.Register.post(session, session.name, session.email, session.password) 
   .then(function(res) {
-    console.log(res);
+
+    console.log('res', res);
     var access_token = res.data;
     session.setAuthorization(access_token);
     cb(session);
@@ -325,7 +327,7 @@ function apiCreateAccounts(task) {
           session.setName(name);
           session.setEmail(email);
           session.setPassword(password);
-          session.setProxy(returnProxyFunc(proxy)); 
+          // session.setProxy(returnProxyFunc(proxy));  // FIX
 
           fastCreateAccount(session, function(session) {
             appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
