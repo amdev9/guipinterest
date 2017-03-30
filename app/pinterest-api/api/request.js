@@ -287,7 +287,8 @@ class Request {
       .then(_.bind(this.parseMiddleware, this))
       .then(function (response) {
         var json = response.body;
-        console.log(response)
+        // console.log(response)
+        
         if (_.isObject(json) && json.status == "success") {
           return response.body
         }
