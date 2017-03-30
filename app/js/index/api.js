@@ -132,6 +132,10 @@ function fullCreateAccount(session, cb) {
       console.log(res);
       cb(session);
     })
+    .catch(function(err) {
+      console.log(err);
+    })
+
 }
 
 function fastCreateAccount(session, cb) {
@@ -213,7 +217,7 @@ function apiRepin(user, task) {
     var cookiePath = path.join(cookieDir, user._id + ".json");
     var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
 
-    var ses = Client.Session.create(cookiePath, user.username, user.password, user.proxy);
+    var ses = Client.Session.create(cookiePath, user.username, user.password); // , user.proxy //!!!!!!!!
     fs.closeSync(fs.openSync(cookiePath, 'w')); // createFile(cookiePath);
     var promiseWhile = function(action) {
       return new Promise(function(resolve, reject) {
@@ -323,7 +327,7 @@ function apiCreateAccounts(task) {
           fs.appendFile(storage, '', (err) => {
             if (err) throw err;
 
-            var session = new Session(storage, returnProxyFunc(proxy));
+            var session = new Session(storage); // , returnProxyFunc(proxy) //!!!!!!!!!
             var password = generatePassword(); 
             var name = email.split("@")[0];
 
@@ -332,7 +336,7 @@ function apiCreateAccounts(task) {
             session.setPassword(password);
    
 
-            fastCreateAccount(session, function(session) {
+            fullCreateAccount(session, function(session) { // fastCreateAccount
               appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
               renderTaskCompletedView(task._id);
               callback();
