@@ -169,8 +169,8 @@ function loggerDb(user_id, logString) {
           var l_string = dateTimeTxt + user.name + ": " + logString;
         }
         var l_filepath = path.join(logsDir, user._id + ".txt");
-        
-        fs.writeFile(l_filepath, '', (err) => {
+        console.log(l_filepath)
+        fs.writeFile(l_filepath, 'test', (err) => {
           if (err) throw err;  
         
           emitLoggerMessage(user._id, l_string);  // emit message to opened views  FIX 
