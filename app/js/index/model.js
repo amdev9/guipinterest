@@ -13,7 +13,7 @@ const os = require('os');
 var config = require('./config/default');
 var softname = config.App.softname;
 var softDir = softname.replace(" ", "");
-
+var fs = require('fs')
 
 var levelPath = path.join(os.tmpdir(), softDir , 'levdb');
 var logsDir = path.join(os.tmpdir(), softDir, 'logs');
