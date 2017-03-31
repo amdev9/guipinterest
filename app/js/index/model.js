@@ -42,7 +42,6 @@ function dropDb() {
 
 function addTaskDb(tasks, users) { 
   if (users) {
-    console.log(tasks, users)
     usersTaskDb(tasks, users);
   } else {
     var task = tasks;

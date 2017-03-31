@@ -215,7 +215,7 @@ function repin(user_id, ses, task, pinId, proxy, cb) {
   .catch(function (err) {
     console.log(err)
     if (err instanceof Client.Exceptions.APIError && err.name != 'NotFoundError') {
-      console.log('cb', 'CouldNotSaveBoard')
+      setCompleteView(user_id, err.ui)
       cb(err);
     } else {
       cb(false);  
@@ -224,6 +224,7 @@ function repin(user_id, ses, task, pinId, proxy, cb) {
 }
 
 function apiRepin(user, task) {
+
   mkdirFolder(logsDir)
   .then(function() {
     setStateView(user._id, 'run');
@@ -293,7 +294,7 @@ function apiCreateAccounts(task) {
     mkdirFolder(cookieDir)
   })
   .then(function() {
-    
+
     setStateView(task._id, 'run');
     loggerDb(task._id, 'Регистрация аккаунтов');
     setCompleteView(task._id, 0);
