@@ -110,19 +110,19 @@ function toggleMenuOn() {
   if ( menuState !== 1 ) {
 
 
-    // if (!taskItemInContext || !taskItemInContext[0] ) {
-    //   selectEmptyMenuOn();
-    // } else if (taskItemInContext.length == 1) {
-    //   if($(".table-info").find("td").eq(2).html() == '-') {
-    //     selectOneNoTaskMenuOn();
-    //   } else if ($(".table-info").find("td").eq(1).html() == '-' && $(".table-info").find("td").eq(0).html() == '-') {
-    //     selectTaskMenuOn();
-    //   } else {
-    //     selectUserTaskMenuOn();
-    //   }
-    // } else if (taskItemInContext.length > 1) {
-    //   multipleMenuOn(taskItemInContext);
-    // }
+    if (!taskItemInContext || !taskItemInContext[0] ) {
+      selectEmptyMenuOn();
+    } else if (taskItemInContext.length == 1) {
+      if($(".table-info").find("td").eq(2).html() == '-') {
+        selectOneNoTaskMenuOn();
+      } else if ($(".table-info").find("td").eq(1).html() == '-' && $(".table-info").find("td").eq(0).html() == '-') {
+        selectTaskMenuOn();
+      } else {
+        selectUserTaskMenuOn();
+      }
+    } else if (taskItemInContext.length > 1) {
+      multipleMenuOn(taskItemInContext);
+    }
 
     
     menuState = 1;
@@ -132,7 +132,7 @@ function toggleMenuOn() {
 
 function multipleMenuOn(taskItems) {
   // console.log("multipleMenuOn");
-  var toHideItems = ['tasks_start' , 'edit_account', 'add_tasks', 'edit_tasks']; // 'tasks_stop'
+  var toHideItems = ['tasks_start' , 'edit_account', 'edit_tasks']; // 'tasks_stop'
   var filled = true;
   $(".table-info").each(function (i, val) {
     if ( $(this).find("td").eq(2).html() == '-') {
@@ -141,20 +141,21 @@ function multipleMenuOn(taskItems) {
   });
   if (filled) {
     var stopFlag = true;
-    for (var t =0; t < taskItems.length; t++ ) {
+    for (var t = 0; t < taskItems.length; t++ ) {
       if (taskItems[t].getAttribute("state") != 'stopped') {
         stopFlag = false;
         break;
       }  
     }
     if (stopFlag == true) {
-       toHideItems = ['tasks_stop', 'edit_account', 'add_tasks', 'edit_tasks'];
+       toHideItems = ['tasks_stop', 'edit_account', 'edit_tasks'];
     } else {
-       toHideItems = ['tasks_start', 'edit_account', 'add_tasks', 'edit_tasks'];
+       toHideItems = ['tasks_start', 'edit_account', 'edit_tasks'];
     }
   }
   var checkFlag = true;
   for (var k =0; k < taskItems.length; k++ ) {
+    // console.log(taskItems[k].getAttribute("type"));
     if (taskItems[k].getAttribute("type") == 'task') {
       checkFlag = false;
       break;
@@ -162,7 +163,7 @@ function multipleMenuOn(taskItems) {
   }
   var checkArray = [];
   if (!checkFlag) {
-    checkArray = ['check_accounts'];
+    checkArray = ['check_accounts', 'add_tasks'];
   }
   var toHideItems = toHideItems.concat(checkArray);
   $('.context-menu__item > a').each(function(i, val) {
