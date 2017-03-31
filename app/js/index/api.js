@@ -160,7 +160,7 @@ function lastBoardId(array) {
   return array[0];
 }
 
-function repin(user_id, ses, task, pinId, proxy, cb) {
+function repin(user_id, ses, task, pinId, cb) {
   var board_id;
   ses
   .then(function(session) {
@@ -233,7 +233,7 @@ function apiRepin(user, task) {
     var cookiePath = path.join(cookieDir, user._id + ".json");
     var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
 
-    var ses = Client.Session.create(cookiePath, user.username, user.password, user.proxy); 
+    var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy)); 
     fs.closeSync(fs.openSync(cookiePath, 'w')); // createFile(cookiePath);
     var promiseWhile = function(action) {
       return new Promise(function(resolve, reject) {
@@ -244,7 +244,7 @@ function apiRepin(user, task) {
           }
 
           if (pin_array[iterator]) {
-            repin(user._id, ses, task, pin_array[iterator], returnProxyFunc(user.proxy), function(success) {
+            repin(user._id, ses, task, pin_array[iterator], function(success) {
               if(success === true) {
                 filterSuccess += 1;
               } else if (success instanceof Client.Exceptions.APIError) {

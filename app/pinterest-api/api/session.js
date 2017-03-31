@@ -11,7 +11,6 @@ class Session {
   constructor(storage, proxy) {
     this.setCookiesStorage(storage);
     if(_.isString(proxy) && !_.isEmpty(proxy)) {
-      console.log(proxy)
       this.proxyUrl = proxy;
     }
   }
@@ -103,8 +102,9 @@ class Session {
   static create(storage, email, password, proxy) { 
     var that = this;
     var session = new Session(storage);
-    if(_.isString(proxy) && !_.isEmpty(proxy))
+    if(_.isString(proxy) && !_.isEmpty(proxy)) {
       session.proxyUrl = proxy;
+    }
     return Session.login(session, email, password); 
   }
 }
