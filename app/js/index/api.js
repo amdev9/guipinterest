@@ -153,6 +153,13 @@ function fastCreateAccount(session, cb) {
   })
 }
 
+function lastBoardId(array) {
+  array.sort(function(a,b) {
+    return Date.parse(b.created_at) - Date.parse(a.created_at);
+  });
+  return array[0];
+}
+
 function repin(user_id, ses, task, pinId, proxy, cb) {
   var board_id;
   ses
@@ -166,7 +173,13 @@ function repin(user_id, ses, task, pinId, proxy, cb) {
   })
   .spread(function(session, res) {
     if (task.last_board) {
-      board_id = res.data[0].id; 
+      var arr = [];
+      res.data.forEach(function(item, i, aa) {
+        arr.push (item);
+        if (i == aa.length - 1) {
+          board_id = lastBoardId(arr).id 
+        }
+      })
     } else {
       board_id = res.data.id
     }
@@ -176,6 +189,7 @@ function repin(user_id, ses, task, pinId, proxy, cb) {
     return [session, Client.Pins.get(session, pinId)]
   })
   .spread(function(session, res) {
+
     var image_signature = res.data.image_signature;
     var closeup_user_note = res.data.closeup_user_note;
     var aggregatedpindata_id = res.data.aggregated_pin_data.id;
@@ -199,6 +213,7 @@ function repin(user_id, ses, task, pinId, proxy, cb) {
     }
   })
   .catch(function (err) {
+    console.log(err)
     if (err instanceof Client.Exceptions.APIError && err.name != 'NotFoundError') {
       console.log('cb', 'CouldNotSaveBoard')
       cb(err);
@@ -222,11 +237,12 @@ function apiRepin(user, task) {
     var promiseWhile = function(action) {
       return new Promise(function(resolve, reject) {
         var func = function(iterator) {
+
           if (iterator > pin_array.length || getStateView(user._id) == 'stop' || getStateView(user._id) == 'stopped' ) {
             return reject(new Error("stop"));
           }
 
-          if (iterator) {
+          if (pin_array[iterator]) {
             repin(user._id, ses, task, pin_array[iterator], returnProxyFunc(user.proxy), function(success) {
               if(success === true) {
                 filterSuccess += 1;
@@ -234,7 +250,7 @@ function apiRepin(user, task) {
                 console.log('succ', success.name)
                 return reject(new Error("stop"));
               }
-              renderUserCompletedView(user._id, pin_array.length, iterator, filterSuccess); 
+              renderUserCompletedView(user._id, pin_array.length, iterator + 1, filterSuccess); 
             });
           }
           
@@ -267,6 +283,10 @@ function apiRepin(user, task) {
 }
 
 
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 function apiCreateAccounts(task) {
   mkdirFolder(logsDir)
   .then(function() {
@@ -288,7 +308,7 @@ function apiCreateAccounts(task) {
     if (!task.own_emails) {
       for(var i = 0; i < task.emails_cnt; i++) {
         var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
-        email_array.push(name + 'llman@mailglobals.co');
+        email_array.push(name + getRandomInt(1000, 99999) + '@gmail.com');
       }
     } else {
       email_array = task.email_parsed;
@@ -335,13 +355,19 @@ function apiCreateAccounts(task) {
             session.setEmail(email);
             session.setPassword(password);
    
-
-            fullCreateAccount(session, function(session) { // fastCreateAccount
-              appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
-              renderTaskCompletedView(task._id);
-              callback();
-            });
-
+            if(task.fast_create) {
+              fastCreateAccount(session, function(session) {
+                appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
+                renderTaskCompletedView(task._id);
+                callback();
+              });
+            } else {
+              fullCreateAccount(session, function(session) {
+                appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 
+                renderTaskCompletedView(task._id);
+                callback();
+              });
+            }
           })
         }, function(err, result) {
           console.log("DONE!");

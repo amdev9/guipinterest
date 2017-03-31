@@ -141,6 +141,7 @@ function editCreateAccounts(task) {
   } else {
     document.getElementById("reg_count").value = task.emails_cnt;
   }
+  document.getElementById("fast_create").checked = task.fast_create;
 }
 
 function createAccounts(taskName) {
@@ -165,8 +166,9 @@ function createAccounts(taskName) {
   task.reg_timeout = document.getElementById("reg_timeout").value;
   task.proxy_file = document.getElementById("proxy_file").value;
   task.output_file = document.getElementById("output_file").value;
-
+  task.fast_create = document.getElementById("fast_create").checked;
   ipc.send('add_task_event', task);
+
   window.close();
 }
 

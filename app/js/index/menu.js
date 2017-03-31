@@ -108,19 +108,23 @@ function resizeListener() {
  */
 function toggleMenuOn() {
   if ( menuState !== 1 ) {
-    if (!taskItemInContext || !taskItemInContext[0] ) {
-      selectEmptyMenuOn();
-    } else if (taskItemInContext.length == 1) {
-      if($(".table-info").find("td").eq(2).html() == '-') {
-        selectOneNoTaskMenuOn();
-      } else if ($(".table-info").find("td").eq(1).html() == '-' && $(".table-info").find("td").eq(0).html() == '-') {
-        selectTaskMenuOn();
-      } else {
-        selectUserTaskMenuOn();
-      }
-    } else if (taskItemInContext.length > 1) {
-      multipleMenuOn(taskItemInContext);
-    }
+
+
+    // if (!taskItemInContext || !taskItemInContext[0] ) {
+    //   selectEmptyMenuOn();
+    // } else if (taskItemInContext.length == 1) {
+    //   if($(".table-info").find("td").eq(2).html() == '-') {
+    //     selectOneNoTaskMenuOn();
+    //   } else if ($(".table-info").find("td").eq(1).html() == '-' && $(".table-info").find("td").eq(0).html() == '-') {
+    //     selectTaskMenuOn();
+    //   } else {
+    //     selectUserTaskMenuOn();
+    //   }
+    // } else if (taskItemInContext.length > 1) {
+    //   multipleMenuOn(taskItemInContext);
+    // }
+
+    
     menuState = 1;
     menu.classList.add( contextMenuActive );
   }

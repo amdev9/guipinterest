@@ -14,7 +14,6 @@ $('.open-in-browser').click((event) => {
   shell.openExternal(event.target.href);
 });
 
-
 $(document).ready(function () {
   $('#navbarBrand').text(softname)
   $('#memberModal').modal({backdrop: 'static', keyboard: false});
@@ -33,7 +32,6 @@ function proxyView(proxyString) {
     return `-`
   }
 }
-
 
 function setModalStatus(result) {
   if(result == 'ok') {
