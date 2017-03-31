@@ -75,7 +75,6 @@ class Session {
   };
 
   static login(session, email, password) {
-    
     return new Request(session) 
     .setMethod('POST')
     .setData({

@@ -231,6 +231,8 @@ class Request {
       throw new Exceptions.CouldNotSaveBoard();
     else if (_.isString(json.message) && json.message.toLowerCase().indexOf('invalid parameters') !== -1)
       throw new Exceptions.InvalidParams();
+    else if (_.isString(json.message_detail) && json.message_detail.toLowerCase().indexOf('spam') !== -1)
+      throw new Exceptions.ActionSpamError();
     throw new Exceptions.RequestError(json);
   }
 

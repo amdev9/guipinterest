@@ -69,6 +69,15 @@ function EmailNotFound(message) {
 util.inherits(EmailNotFound, APIError);
 exports.EmailNotFound = EmailNotFound;
 
+function ActionSpamError(message) {
+    this.name = "ActionSpamError";
+    this.message = message || "Sorry! You've hit a block (logins) we have in place to combat spam. Please try again later.";
+    this.ui = "Спам блок"
+}
+util.inherits(ActionSpamError, APIError);
+exports.ActionSpamError = ActionSpamError;
+
+
 function ParseError(response, request) {
     this.name = "ParseError";
     this.message = "Not possible to parse API response";
