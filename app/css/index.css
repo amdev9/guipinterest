@@ -1,6 +1,16 @@
+
 .table th,td {
   text-align: center;
   font-size: .840rem;
+
+  -webkit-user-select: none;
+  /* user-select -- это нестандартное свойство */
+
+  -moz-user-select: none;
+  /* поэтому нужны префиксы */
+
+  -ms-user-select: none;
+
 }
  
 .modal, .modal-body, .modal-footer, .modal-header {
