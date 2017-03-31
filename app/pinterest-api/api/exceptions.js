@@ -77,6 +77,23 @@ function ActionSpamError(message) {
 util.inherits(ActionSpamError, APIError);
 exports.ActionSpamError = ActionSpamError;
 
+function ActionSpamError(message) {
+    this.name = "ActionSpamError";
+    this.message = message || "Sorry! You've hit a block (logins) we have in place to combat spam. Please try again later.";
+    this.ui = "Спам блок"
+}
+util.inherits(ActionSpamError, APIError);
+exports.ActionSpamError = ActionSpamError;
+
+
+function AccountSupsendedError(message) {
+    this.name = "AccountSupsendedError";
+    this.message = message || "Your account has been supsended";
+    this.ui = "Забанен"
+}
+util.inherits(AccountSupsendedError, APIError);
+exports.AccountSupsendedError = AccountSupsendedError;
+
 
 function ParseError(response, request) {
     this.name = "ParseError";
@@ -84,8 +101,6 @@ function ParseError(response, request) {
     this.response = response;
     this.request = request;
 }
-
-
 
 util.inherits(ParseError, APIError);
 exports.ParseError = ParseError;
