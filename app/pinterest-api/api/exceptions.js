@@ -96,5 +96,33 @@ util.inherits(NotFoundError, APIError);
 exports.NotFoundError = NotFoundError;
 
 
+// tatusCode
+// :
+// 429
+// Object
+// code
+// :
+// 9
+// data
+// :
+// null
+// generated_at
+// :
+// "Fri, 31 Mar 2017 21:34:41 +0000"
+// host
+// :
+// "coreapp-ngapi-prod-0a018663"
+// message
+// :
+// "We could not complete that request."
+// message_detail
+// :
+// "Sorry! You've hit a block (logins) we have in place to combat spam. Please try again later."
+// status
+// :
+// "failure"
+
+
+
 
 // StatusCodeError: 401 - "{\"status\": \"failure\", \"code\": 78, \"host\": \"coreapp-ngapi-prod-0a01048d\", \"error\": {\"message\": \"None\"}, \"generated_at\": \"Wed, 08 Mar 2017 22:51:53 +0000\", \"message\": \"The password you entered is incorrect.\", \"data\": null}"

@@ -223,16 +223,16 @@ function repin(user_id, ses, task, pinId, cb) {
   });
 }
 
-function apiRepin(user, task) {
+function apiRepin(user, task, token) {
 
   mkdirFolder(logsDir)
   .then(function() {
     setStateView(user._id, 'run');
     var iterator = 0;
     var filterSuccess = 0;
-    var cookiePath = path.join(cookieDir, user._id + ".json");
+    var cookiePath = path.join(cookieDir, user._id + '.json');
     var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
-
+    Client.Request.setToken(token)
     var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy)); 
     fs.closeSync(fs.openSync(cookiePath, 'w')); // createFile(cookiePath);
     var promiseWhile = function(action) {
@@ -271,7 +271,8 @@ function apiRepin(user, task) {
           iterator++;
         }, 2000);
       });
-    }).catch(function (err) {
+    })
+    .catch(function (err) {
       if(err.message == 'stop') {
         console.log('stopped')
         loggerDb(user._id, 'Фильтрация остановлена');
@@ -288,7 +289,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function apiCreateAccounts(task) {
+function apiCreateAccounts(task, token) {
   mkdirFolder(logsDir)
   .then(function() {
     mkdirFolder(cookieDir)
@@ -298,6 +299,9 @@ function apiCreateAccounts(task) {
     setStateView(task._id, 'run');
     loggerDb(task._id, 'Регистрация аккаунтов');
     setCompleteView(task._id, 0);
+
+    Client.Request.setToken(token)
+    
     const NAMES = require('./config/names').names;
     const SURNAMES = require('./config/names').surnames;
     var Session = require('./pinterest-api/api/session');

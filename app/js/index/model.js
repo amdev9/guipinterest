@@ -99,12 +99,20 @@ function runTasksDb(rows) {
     db.get(row_id).then(function(row) {
       if (row.type == 'user') {
         
-
-        apiRepin(row, row.task);
+        var token = {
+          row: row._id
+        }
+        tokens.set(row._id, token)
+        apiRepin(row, row.task, token);
 
       } else if (row.type == 'task') {
+
+        var token = {
+          row: row._id
+        }
+        tokens.set(row._id, token)
         if (row.name == 'create_accounts') {
-          apiCreateAccounts(row);
+          apiCreateAccounts(row, token);
         }
 
       }
