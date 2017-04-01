@@ -351,7 +351,7 @@ function apiCreateAccounts(task, token) {
 
           fs.appendFile(storage, '', (err) => {
             if (err) throw err;
-
+            
             var session = new Session(storage, returnProxyFunc(proxy) );
             var password = generatePassword(); 
             var name = email.split("@")[0];
