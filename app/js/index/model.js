@@ -61,35 +61,35 @@ function userObj(userArr) {
   this.status = '-';
 }
 
+
 function addUsersDb(users) {
   // pass user data fill to add js
   var usersObjArr = [];
   var usersRender = [];
   users.forEach(function(userString, i, fullArr) {
+
     var userArr = userString.split('|');
     if (userArr.length == 3) {
       var user = new userObj(userArr);
       if(validateProxyString(user.proxy)) {
         usersObjArr.push(user);
       }
-      if ( i == fullArr.length - 1) {
-        
-        db.bulkDocs(usersObjArr)
-          .then(function (response) {
+    }
 
-            response.forEach(function(item, i, arr) {
-              if (item.ok) {
-                usersRender.push(usersObjArr[i]);
-              }
-              if (i == arr.length - 1) {
-                renderUserRowView(usersRender);
-              }
-            });
-
-        }).catch(function (err) {
-          console.log(err);
-        });
-      }
+    if (i == fullArr.length - 1) {
+      db.bulkDocs(usersObjArr)
+        .then(function (response) {
+          response.forEach(function(item, i, arr) {
+            if (item.ok) {
+              usersRender.push(usersObjArr[i]);
+            }
+            if (i == arr.length - 1) {
+              renderUserRowView(usersRender);
+            }
+          });
+      }).catch(function (err) {
+        console.log(err);
+      });
     }
   }); 
 }
