@@ -61,7 +61,7 @@
     "appId": "com.socialdev.pinmakerpro",
     "mac": {
       "category": "your.app.category.type",
-      "icon": "/Users/alex/dev/nodejs/guipinterest/build/app/icon.icns",
+      "icon": "/Users/alex/dev/nodejs/guipinterest/app/build/icon.icns",
       "target": [
         "zip",
         "dmg"
