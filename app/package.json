@@ -4,7 +4,7 @@
   "productName": "PinMakerPRO",
   "version": "0.0.1",
   "description": "PinMakerPRO - продвижение в Pinterest",
-  "author": "SocialDev <support@mailglobals.co>",
+  "author": "SocialDev <socialdevteam@yandex.ru>",
   "main": "main.js",
   "scripts": {
     "postinstall": "electron-rebuild -p",
