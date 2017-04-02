@@ -61,14 +61,15 @@
     "appId": "com.github.ratm92.electronupdaterexample",
     "mac": {
       "category": "your.app.category.type",
-      "icon": "/Users/alex/dev/nodejs/guipinterest/build/PinMaker.icns",
+      "icon": "/Users/alex/dev/nodejs/guipinterest/build/app/icon.icns",
       "target": [
         "zip",
         "dmg"
       ]
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "C:/Users/alex/home/guipinterest/app/build/icon.ico"
     }
   }
 }
