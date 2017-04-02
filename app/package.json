@@ -58,7 +58,7 @@
     "spectron": "^3.6.0"
   },
   "build": {
-    "appId": "com.github.ratm92.electronupdaterexample",
+    "appId": "com.socialdev.pinmakerpro",
     "mac": {
       "category": "your.app.category.type",
       "icon": "/Users/alex/dev/nodejs/guipinterest/build/app/icon.icns",
