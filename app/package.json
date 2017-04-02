@@ -3,7 +3,7 @@
   "private": true,
   "productName": "PinMakerPRO",
   "version": "0.0.1",
-  "description": "PinMakerPRO - продвижение в Pinterest",
+  "description": "Программа для продвижения в Pinterest",
   "author": "SocialDev <socialdevteam@yandex.ru>",
   "main": "main.js",
   "scripts": {
