@@ -25,6 +25,8 @@ let version = window.location.hash.substring(1);
 // document.getElementById('version').innerText = version;
 document.title = softname + " " + version
 
+
+
 ipcRenderer.on('message', function(event, text) {
   var container = document.getElementById('messages');
   var message = document.createElement('div');

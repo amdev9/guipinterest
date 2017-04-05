@@ -16,6 +16,7 @@
   "dependencies": {
     "async": "^2.1.4",
     "bluebird": "^3.0.5",
+    "clipboard": "^1.6.1",
     "concat-stream": "^1.6.0",
     "electron-builder-squirrel-windows": "^13.10.1",
     "electron-compile": "^6.1.3",
