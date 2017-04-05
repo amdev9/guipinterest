@@ -6,10 +6,12 @@ $(function() {
 
     $("#repin_form").validate({
     rules: {
-       
+      board_names: "required",
+      pin_file: "required"
     },
     messages: {
-       
+      board_names: "Введите названия досок",
+      pin_file: "Выберите файл",
     },
     highlight: function(element) {
       $(element).closest('.form-group').addClass('has-danger');
