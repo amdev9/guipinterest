@@ -256,20 +256,39 @@ function positionMenu(e) {
   clickCoords = getPosition(e);
   clickCoordsX = clickCoords.x;
   clickCoordsY = clickCoords.y;
+
   menuWidth = menu.offsetWidth + 4;
   menuHeight = menu.offsetHeight + 4;
   windowWidth = window.innerWidth;
   windowHeight = window.innerHeight;
+
   if ( (windowWidth - clickCoordsX) < menuWidth ) {
     menu.style.left = windowWidth - menuWidth + "px";
   } else {
     menu.style.left = clickCoordsX + "px";
   }
-  if ( (windowHeight - clickCoordsY) < menuHeight ) {
+  if ( (windowHeight - clickCoordsY) < menuHeight  && scrollTop == 0 ) {
+    menu.style.top = windowHeight - menuHeight + "px";
+    // console.log(windowWidth)
+  } else if ( (windowHeight - clickCoordsY) < menuHeight && scrollTop > 0 ) {
+    
+    var height = $(window).height();
+    var scrollTop = $(window).scrollTop();
+    // var scrollWidth = $(window).scrollWidth;
+
+    // console.log(windowWidth)
+    // console.log('windowHeight', windowHeight)
+    // console.log('height', height);
+    // console.log('scrollTop', scrollTop);
+    // console.log('clickCoordsY', clickCoordsY);
+
     menu.style.top = windowHeight - menuHeight + "px";
   } else {
+    // console.log('else', windowWidth)
     menu.style.top = clickCoordsY + "px";
   }
+
+
 }
 
 /**
