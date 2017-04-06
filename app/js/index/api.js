@@ -163,14 +163,14 @@ function lastBoardId(array) {
 function repin(user_id, ses, task, pinId, cb) {
   var board_id;
   ses
-  .then(function(session) {
-    if (task.last_board) {
-      return [session, Client.Users.meBoards(session)] 
-    } else {
-      var boardName = task.board_names[Math.floor(Math.random() * task.board_names.length)];
-      return [session, Client.Boards.add(session, boardName)]
-    }
-  })
+  // .then(function(session) {
+  //   if (task.last_board) {
+  //     return [session, Client.Users.meBoards(session)] 
+  //   } else {
+  //     var boardName = task.board_names[Math.floor(Math.random() * task.board_names.length)];
+  //     return [session, Client.Boards.add(session, boardName)]
+  //   }
+  // })
   .spread(function(session, res) {
     if (task.last_board) {
       var arr = [];
@@ -233,7 +233,17 @@ function apiRepin(user, task, token) {
     var cookiePath = path.join(cookieDir, user._id + '.json');
     var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
     Client.Request.setToken(token)
-    var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy)); 
+    var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy))
+      .then(function(session) {
+        if (task.last_board) {
+          return [session, Client.Users.meBoards(session)] 
+        } else {
+          var boardName = task.board_names[Math.floor(Math.random() * task.board_names.length)];
+          return [session, Client.Boards.add(session, boardName)]
+        }
+      })
+
+
     fs.closeSync(fs.openSync(cookiePath, 'w')); // createFile(cookiePath);
     var promiseWhile = function(action) {
       return new Promise(function(resolve, reject) {
