@@ -12,7 +12,7 @@ var async = require('async');
 var config = require('./config/default');
 var softname = config.App.softname;
 var _ = require('lodash');
-var softDir = softname.replace(" ", "");
+var softDir = softname.replace(/ /g, "");
 var cookieDir = path.join(os.tmpdir(), softDir , 'cookie');
 
 
@@ -134,6 +134,11 @@ function fullCreateAccount(session, cb) {
     })
     .catch(function(err) {
       console.log(err);
+      if (err instanceof Client.Exceptions.APIError) {
+        loggerDb(task._id, 'Ошибка при регистрации ' + email + ' ' + proxy + ': ' + err.message);
+      } else {
+        loggerDb(task._id, 'Ошибка при регистрации ' + email + ' ' + proxy + ': ' + err.message);
+      }
     })
 
 }
@@ -150,6 +155,11 @@ function fastCreateAccount(session, cb) {
   })
   .catch(function(err) {
     console.log(err);
+    if (err instanceof Client.Exceptions.APIError) {
+      loggerDb(task._id, 'Ошибка при регистрации ' + email + ' ' + proxy + ': ' + err.message);
+    } else {
+      loggerDb(task._id, 'Ошибка при регистрации ' + email + ' ' + proxy + ': ' + err.message);
+    }
   })
 }
 
@@ -231,7 +241,7 @@ function apiRepin(user, task, token) {
     var iterator = 0;
     var filterSuccess = 0;
     var cookiePath = path.join(cookieDir, user._id + '.json');
-    var pin_array = fs.readFileSync(task.pin_file, 'utf8').split('\n').filter(isEmpty);
+    var pin_array = fs.readFileSync(task.pin_file, 'utf8').replace(/ /g, "").split(/\r\n|\r|\n/).filter(isEmpty);
     Client.Request.setToken(token)
     var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy))
       .then(function(session) {
@@ -316,14 +326,16 @@ function apiCreateAccounts(task, token) {
     const SURNAMES = require('./config/names').surnames;
     var Session = require('./pinterest-api/api/session');
    
-    var proxy_array = fs.readFileSync(task.proxy_file, 'utf8').split('\n').filter(isEmpty).filter(validateProxyString); // check
+    var proxy_array = fs.readFileSync(task.proxy_file, 'utf8')  // FIX readFileSync
+    proxy_array = proxy_array.replace(/ /g, "").split(/\r\n|\r|\n/).filter(isEmpty).filter(validateProxyString);
+    console.log(proxy_array)
 
     var email_array = [];
 
     if (!task.own_emails) {
       for(var i = 0; i < task.emails_cnt; i++) {
         var name = SURNAMES[Math.floor(Math.random() * SURNAMES.length)] + NAMES[Math.floor(Math.random() * SURNAMES.length)];
-        email_array.push(name + getRandomInt(1000, 99999) + '@gmail.com');
+        email_array.push(name + getRandomInt(1000, 999999) + '@gmail.com');
       }
     } else {
       email_array = task.email_parsed;
@@ -348,15 +360,23 @@ function apiCreateAccounts(task, token) {
       return result;
     };
     
+
+    console.log(chunked)
+
+    // async.forEach(task.partitions, function (taskpart, callback) {
+
     var promiseWhile = function( action, email_tuple) {
+      console.log(email_tuple)
       var resolver = Promise.defer();
       var indicator = 0;
       var i = 0;
       var func = function(results) {
         
+
         async.mapValues(_.object(email_tuple[i], proxy_array), function (proxy, email, callback) {
 
 
+          console.log(email, proxy)
           var storage = path.join(cookieDir, email + '.json')
 
           fs.appendFile(storage, '', (err) => {
@@ -370,6 +390,7 @@ function apiCreateAccounts(task, token) {
             session.setEmail(email);
             session.setPassword(password);
    
+            
             if(task.fast_create) {
               fastCreateAccount(session, function(session) {
                 appendStringFile(task.output_file, session.email + "|" + session.password + "|" + proxy); 

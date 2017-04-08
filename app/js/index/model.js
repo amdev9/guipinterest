@@ -12,7 +12,7 @@ var path = require('path');
 const os = require('os');
 var config = require('./config/default');
 var softname = config.App.softname;
-var softDir = softname.replace(" ", "");
+var softDir = softname.replace(/ /g, "");
 var fs = require('fs')
 
 var levelPath = path.join(os.tmpdir(), softDir , 'levdb');

@@ -13,7 +13,7 @@ const ipcRenderer = require('electron').ipcRenderer
 var config = require('./config/default')
 const devIsOpen = config.App.devTools
 var softname = config.App.softname
-var softDir = softname.replace(" ", "");
+var softDir = softname.replace(/ /g, "")
 
 var logsDir = path.join(os.tmpdir(), softDir, 'logs')
 

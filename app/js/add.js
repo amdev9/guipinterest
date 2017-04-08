@@ -32,7 +32,7 @@ var openFile = function(selector) {
 var parseDataFileToArray = (selector) => {
   var filename = document.getElementById(selector).value;
   fs.readFile(filename, function(err, f) {
-    var array = f.toString().split('\n').filter(isEmpty);
+    var array = f.toString().split(/\r\n|\r|\n/).filter(isEmpty);
     ipc.send('users_add', array);
     window.close(); 
   });

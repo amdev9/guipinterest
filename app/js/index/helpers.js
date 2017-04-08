@@ -16,38 +16,51 @@ function isIpBlock(number) {
 }
 
 function strInt(s) {
+
   var i = parseInt(s, 10);
+  // console.log(i, i != NaN, i, i.toString().length, s, s.length)
   if( i != NaN && i.toString().length == s.length) {
+    
     return i;
   }
 }
 
 function ipPortFunc(ip, port) {
+
+  // console.log(ip, port)
   var ipArray = ip.split(".");
   if(ipArray.length == 4 && ipArray.every(isIpBlock)) {} 
   else {
+    // console.log('detect')
     return false;
   }
   var port = strInt(port);
+  // console.log(port)
   if(port && port > 0 && port < 65535) {} 
   else {
+    // console.log('detect')
     return false;
   }
   return true;
 }
 
 function validateProxyString(proxyString) {
+
   if(proxyString == '') {
     return true;
   }
   var good = true;
   var splited = proxyString.split(":");
+
+
   /*  proxy_ip:proxy_port */
   if(splited.length == 2) {
     good = ipPortFunc(splited[0], splited[1]);
+     
   /*  proxy_name:proxy_pass:proxy_ip:proxy_port */
   } else if(splited.length == 4) { 
     good = ipPortFunc(splited[2], splited[3]);
+    
     var name = splited[0];
     if(name.length == 0) {
       good = false;
@@ -56,6 +69,7 @@ function validateProxyString(proxyString) {
   } else {
     good = false;
   }
+ 
   return good;
 } 
 

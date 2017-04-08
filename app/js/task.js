@@ -159,7 +159,7 @@ function createAccounts(taskName) {
   task.email_parsed = '';
   task.own_emails = document.getElementById("own_emails").checked;
   if(document.getElementById("own_emails").checked == true) {
-    task.email_parsed = document.getElementById("parsed_own_emails").value.split('\n').filter(isEmpty);
+    task.email_parsed = document.getElementById("parsed_own_emails").value.split(/\r\n|\r|\n/).filter(isEmpty);
   } else {
     task.emails_cnt = document.getElementById("reg_count").value;
   }
@@ -197,7 +197,7 @@ function repin(taskName) {
       last_board = true;
     }
     task.last_board = last_board;
-    var board_names = document.getElementById("board_names").value.split('\n');
+    var board_names = document.getElementById("board_names").value.split(/\r\n|\r|\n/);
     task.board_names = board_names.filter(isEmpty);
     tasks.push(task);
     if(iter == arr.length - 1) {      
