@@ -295,7 +295,7 @@ function apiRepin(user, task, token) {
     .catch(function (err) {
       if(err.message == 'stop') {
         console.log('stopped')
-        loggerDb(user._id, 'Фильтрация остановлена');
+        loggerDb(user._id, 'Репинниг остановлен');
         setStateView(user._id, 'stopped');
       } else {
         console.log(err.message);
