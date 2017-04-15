@@ -44,7 +44,7 @@ const ROUTES = {
   users_contacts_suggestions: 'v3/users/contacts/suggestions/share/?<%= params %>',
 
   interests_feed: 'v3/interests/<%= id %>/feed/?<%= params %>',
-  interests_related: 'v3/interests/<%= category %>/related/?<%= params %>',
+  interests_related: 'v3/interests/<%= id %>/related/?<%= params %>', //category
   interests_id_params: 'v3/interests/<%= id %>/?<%= params %>',
 
   conversations: 'v3/conversations/',

@@ -20,7 +20,6 @@ function checkLicense(cb) {
     virtualCheck(cb)
       .then(function(res) {
         //
-
         bios(function(obj) {
           var sendData = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"]+
             "|"+obj["BIOSVendor"]+"|"+obj["SystemManufacturer"]+"|"+obj["BaseBoardManufacturer"];

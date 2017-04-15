@@ -89,7 +89,7 @@ app.on('ready', function() {
     platform = 'osx'
   }
   let url = `http://${host}/update/${platform}_${os.arch()}/${app.getVersion()}`
-  console.log(url)
+  // console.log(url)
   
   if (platform == 'osx') {
     autoUpdater.setFeedURL(url)

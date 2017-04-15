@@ -18,11 +18,11 @@ Interests.get = function(session, id) {
     .send()
 }
 
-Interests.related = function(session, category) {
+Interests.related = function(session, id) {
   return new Request(session)
     .setMethod('GET')
     .setResource('interests_related', {
-      category: category
+      id: id
     })
     .send()
 }
