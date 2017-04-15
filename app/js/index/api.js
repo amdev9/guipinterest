@@ -312,6 +312,9 @@ function apiRepin(user, task, token) {
   mkdirFolder(logsDir)
   .then(function() {
     setStateView(user._id, 'run');
+    setCompleteView(user._id, '-');
+    
+
     var iterator = 0;
     var filterSuccess = 0;
     var cookiePath = path.join(cookieDir, user._id + '.json');

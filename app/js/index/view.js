@@ -164,18 +164,28 @@ function userRowRenderView(user_id) {
   })
 }
 
-function renderNewTaskCompletedView(user_id) {
-  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html(0);
+function renderNewTaskCompletedView(id) {
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(4).html(0);
 }
 
-function renderTaskCompletedView(user_id) {
-  var currentValue = +getCompleteView(user_id);
+function renderTaskCompletedView(id) {
+  var currentValue = +getCompleteView(id);
   currentValue++;
-  setCompleteView(user_id, currentValue);
+  setCompleteView(id, currentValue);
 }
 
-function renderUserCompletedView(user_id, limit, indicator, filterSuccess) {
-  $('#table1 tr[data-id="' + user_id + '"]').find("td").eq(4).html(limit + "/" + indicator + "/" + filterSuccess);
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+function renderUserCompletedView(id, limit, indicator, filterSuccess) {
+  var pad_length = limit.toString().length + 1;
+  limit = pad(limit, pad_length, ' ')
+  indicator = pad(indicator, pad_length, ' ')
+  filterSuccess = pad(filterSuccess, pad_length, ' ')
+  $('#table1 tr[data-id="' + id + '"]').find("td").eq(4).html(limit + " /" + indicator + " /" + filterSuccess);
 }
 
 function renderTaskRowView(task_id, taskName) { 
