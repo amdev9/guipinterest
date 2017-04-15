@@ -19,15 +19,15 @@ function checkLicense(cb) {
 
     virtualCheck(cb)
       .then(function(res) {
-        console.log(res)
-        bios(function(obj) {
+        //
 
+        bios(function(obj) {
           var sendData = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"]+
             "|"+obj["BIOSVendor"]+"|"+obj["SystemManufacturer"]+"|"+obj["BaseBoardManufacturer"];
           var serialKey = obj['memUserDir']+"|"+obj["BIOSVersion"]+"|"+obj["DiskEnum"];
           makePost(sendData, serialKey, cb);
-
         });
+        //
       })
       .catch(function(err) {
         cb('vm');
@@ -71,7 +71,7 @@ function makePost(sendData, serialKey, cb) {
     });
     response.on('end', function () {  
       var resp = JSON.parse(str);
-      console.log(resp);
+      // console.log(resp);
       if (resp.status == 'ok') {
         var hash = sha256(sendData, secretSerial);
         if (resp.message == hash) {
