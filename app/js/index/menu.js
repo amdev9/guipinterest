@@ -131,7 +131,7 @@ function toggleMenuOn() {
 }
 
 function multipleMenuOn(taskItems) {
-  // console.log("multipleMenuOn");
+  console.log("multipleMenuOn");
   var toHideItems = ['tasks_start' , 'edit_account', 'edit_tasks', 'show_logs']; // 'tasks_stop'
   var filled = true;
   $(".table-info").each(function (i, val) {
@@ -148,14 +148,14 @@ function multipleMenuOn(taskItems) {
       }  
     }
     if (stopFlag == true) {
-       toHideItems = ['tasks_stop', 'edit_account', 'edit_tasks'];
+       toHideItems = ['tasks_stop', 'edit_account', 'edit_tasks', 'show_logs'];
     } else {
-       toHideItems = ['tasks_start', 'edit_account', 'edit_tasks'];
+       toHideItems = ['tasks_start', 'edit_account', 'edit_tasks', 'show_logs'];
     }
   }
   var checkFlag = true;
   for (var k =0; k < taskItems.length; k++ ) {
-    // console.log(taskItems[k].getAttribute("type"));
+    console.log(taskItems[k].getAttribute("type"));
     if (taskItems[k].getAttribute("type") == 'task') {
       checkFlag = false;
       break;
@@ -174,7 +174,7 @@ function multipleMenuOn(taskItems) {
 }
 
 function selectUserTaskMenuOn() {
-  // console.log("selectUserTaskMenuOn");
+  console.log("selectUserTaskMenuOn");
   var additionalItemsToHide = [];
   var state = taskItemInContext[0].getAttribute("state");
   if ( state == 'run' ) {
@@ -193,7 +193,7 @@ function selectUserTaskMenuOn() {
 }
 
 function selectTaskMenuOn() {
-  // console.log("selectTaskMenuOn");
+  console.log("selectTaskMenuOn");
   var additionalItemsToHide = [];
   var state = taskItemInContext[0].getAttribute("state");
   if ( state == 'run' ) {
@@ -212,7 +212,7 @@ function selectTaskMenuOn() {
 }
 
 function selectOneNoTaskMenuOn() {
-  // console.log("selectOneNoTaskMenu");
+  console.log("selectOneNoTaskMenu");
   $('.context-menu__item > a').each(function(i, val) {
     if($(this).attr("data-action") == 'tasks_start' || $(this).attr("data-action") == 'edit_tasks') { //  $(this).attr("data-action") == 'tasks_stop' || 
       $('.context-menu__item').eq(i).addClass("hidden");
@@ -221,7 +221,7 @@ function selectOneNoTaskMenuOn() {
 }
 
 function selectEmptyMenuOn() {
-  // console.log("selectEmptyMenuOn");
+  console.log("selectEmptyMenuOn");
   $('.context-menu__item > a').each(function(i, val) {
     if($(this).attr("data-action") != 'add_tasks' && $(this).attr("data-action") != 'add_accounts') {
       $('.context-menu__item').eq(i).addClass("hidden");
@@ -230,7 +230,7 @@ function selectEmptyMenuOn() {
 }
 
 function selectEmptyMenuOff() {
-  // console.log("selectEmptyMenuOff"); 
+  console.log("selectEmptyMenuOff"); 
   $('.context-menu__item > a').each(function(i, val) {
     $('.context-menu__item').eq(i).removeClass("hidden");
   });
@@ -269,22 +269,22 @@ function positionMenu(e) {
   }
   if ( (windowHeight - clickCoordsY) < menuHeight  && scrollTop == 0 ) {
     menu.style.top = windowHeight - menuHeight + "px";
-    // console.log(windowWidth)
+    console.log(windowWidth)
   } else if ( (windowHeight - clickCoordsY) < menuHeight && scrollTop > 0 ) {
     
     var height = $(window).height();
     var scrollTop = $(window).scrollTop();
     // var scrollWidth = $(window).scrollWidth;
 
-    // console.log(windowWidth)
-    // console.log('windowHeight', windowHeight)
-    // console.log('height', height);
-    // console.log('scrollTop', scrollTop);
-    // console.log('clickCoordsY', clickCoordsY);
+    console.log(windowWidth)
+    console.log('windowHeight', windowHeight)
+    console.log('height', height);
+    console.log('scrollTop', scrollTop);
+    console.log('clickCoordsY', clickCoordsY);
 
     menu.style.top = windowHeight - menuHeight + "px";
   } else {
-    // console.log('else', windowWidth)
+    console.log('else', windowWidth)
     menu.style.top = clickCoordsY + "px";
   }
 
