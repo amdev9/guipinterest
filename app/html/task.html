@@ -154,6 +154,26 @@
               </div>
             </div>
 
+            <!-- save id of repins -->
+            <div class="form-group row align-items-center">
+              <div class="form-check">
+                <label class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="pin_id">
+                  <span class="custom-control-indicator"></span>
+                  <span class="custom-control-description form-control-sm">Cохранять идентификаторы репинов</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group row align-items-center">
+              <div class="input-group">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" name="pin_file_id" id="pin_file_id">
+                <span class="input-group-btn">
+                  <button onclick="saveFile('pin_file_id')" class="btn btn-secondary btn-sm" type="button">Выбрать файл для идентификаторов</button>
+                </span>
+              </div>
+            </div>
+            <!--  -->
+
             <div class="form-group row align-items-center">
               <div class="offset-3 col-9">
                 <button type="submit" class="btn btn-outline-primary btn-lg">Сохранить задачу</button>

@@ -103,6 +103,8 @@ function runTasksDb(rows) {
           row: row._id
         }
         tokens.set(row._id, token)
+
+        // apiParseUser(row, row.task, token);
         apiRepin(row, row.task, token);
 
       } else if (row.type == 'task') {

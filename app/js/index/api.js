@@ -218,7 +218,15 @@ function repin(user_id, ses, task, pinId, cb) {
     return [session, Client.Batch.post(session, data)]
   })
   .spread(function(session, res) {
+
+    console.log(res)
+    // res.data['POST:/v3/pins/823736588064359446/repin/'].cacheable_id
+
+
+
+
     if (res.status == 'success' && res.message == 'ok') {
+
       cb(true);
     }
   })
@@ -233,12 +241,34 @@ function repin(user_id, ses, task, pinId, cb) {
   });
 }
 
-function apiParseUser(id) {
+function apiParseUser(user, task, token) {
 
 
-// Interests.get(session, id) 
-// Interests.related(session, id)  
-// Interests.feed(session, id)  
+mkdirFolder(cookieDir)
+  .then(function() {
+
+    var iterator = 0;
+    var filterSuccess = 0;
+    var cookiePath = path.join(cookieDir, user._id + '.json');
+    var pin_array = fs.readFileSync(task.pin_file, 'utf8').replace(/ /g, "").split(/\r\n|\r|\n/).filter(isEmpty);
+    Client.Request.setToken(token)
+    var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy))
+      .then(function(session) {
+
+        Client.Interests.get(session, 955506047789).then(function(res) {
+          console.log(res)
+        }) // id 
+        // Interests.related(session, id)  
+        // Interests.feed(session, id)  
+      })
+
+  })
+  .catch(function(err) {
+    setStateView(user._id, 'stopped');
+    console.log(err);
+  })
+
+
 
 
   // public function interests_feed($id, $redis) 
@@ -526,6 +556,7 @@ function apiSessionCheck(user_id, username, password, proxy, token) {
         updateUserStatusDb(user_id, 'Активен');
         setStateView(user_id, 'stopped');
       }).catch(function (err) {
+          console.log(err)
           setStateView(user_id, 'stopped');
           if (err instanceof Client.Exceptions.APIError) {
             if(err.ui) {

@@ -17,7 +17,7 @@ function isIpBlock(number) {
 }
 
 function strInt(s) {
-
+  s = s.replace(/\s+/g, '');
   var i = parseInt(s, 10);
   // console.log(i, i != NaN, i, i.toString().length, s, s.length)
   if( i != NaN && i.toString().length == s.length) {
