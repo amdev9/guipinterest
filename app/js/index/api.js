@@ -466,7 +466,7 @@ function apiCreateAccounts(task, token) {
     };
     
 
-    console.log(chunked)
+    // console.log(chunked)
 
     // async.forEach(task.partitions, function (taskpart, callback) {
 
@@ -556,7 +556,7 @@ function apiSessionCheck(user_id, username, password, proxy, token) {
         updateUserStatusDb(user_id, 'Активен');
         setStateView(user_id, 'stopped');
       }).catch(function (err) {
-          console.log(err)
+          // console.log(err)
           setStateView(user_id, 'stopped');
           if (err instanceof Client.Exceptions.APIError) {
             if(err.ui) {

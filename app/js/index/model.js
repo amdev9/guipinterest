@@ -94,6 +94,21 @@ function addUsersDb(users) {
   }); 
 }
 
+function checkAccountsDb(user_ids) {
+  tokens.clear()
+  user_ids.forEach(function(user_id) {
+    db.get(user_id).then(function(user) {
+      var token = {
+          row: user._id
+      }
+      tokens.set(user._id, token)
+      apiSessionCheck(user._id, user.username, user.password, user.proxy, token); 
+    }).catch(function(err) {
+      console.log(err);
+    });
+  });
+}
+
 function runTasksDb(rows) {
   rows.forEach(function (row_id) {
     db.get(row_id).then(function(row) {
@@ -153,20 +168,7 @@ function completeUserTaskDb(rows, taskName, params) {
   });
 }
 
-function checkAccountsDb(user_ids) {
-  tokens.clear()
-  user_ids.forEach(function(user_id) {
-    db.get(user_id).then(function(user) {
-      var token = {
-          row: user._id
-      }
-      tokens.set(user._id, token)
-      apiSessionCheck(user._id, user.username, user.password, user.proxy, token); 
-    }).catch(function(err) {
-      console.log(err);
-    });
-  });
-}
+
 
 function loggerDb(user_id, logString) {
   mkdirFolder(logsDir)
