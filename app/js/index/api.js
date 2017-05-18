@@ -251,16 +251,20 @@ function apiParseUser(user, task, token) {
       var filterSuccess = 0;
       var cookiePath = path.join(cookieDir, user._id + '.json');
       var pin_array = fs.readFileSync(task.pin_file, 'utf8').replace(/ /g, "").split(/\r\n|\r|\n/).filter(isEmpty);
+      
       Client.Request.setToken(token)
+      
       var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy))
         .then(function(session) {
 
           Client.Interests.get(session, 955506047789).then(function(res) {
             console.log(res)
-          }) // id 
+          }) 
+          // id 
           // Interests.related(session, id)  
           // Interests.feed(session, id)  
         })
+        
 
     })
     .catch(function(err) {
