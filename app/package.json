@@ -2,7 +2,7 @@
   "name": "guipinterest",
   "private": true,
   "productName": "PinMaker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Программа для продвижения в Pinterest",
   "author": "SocialDev <socialdevteam@yandex.ru>",
   "main": "main.js",

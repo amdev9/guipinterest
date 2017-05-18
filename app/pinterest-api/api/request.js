@@ -89,7 +89,7 @@ class Request {
       this.setAuthorization(session.Authorization);
     }
     if(session.proxyUrl) {
-      console.log('proxy', session.proxyUrl)
+      // console.log('proxy', session.proxyUrl)
       this.setOptions({proxy: session.proxyUrl});
     }
     this.setOptions({

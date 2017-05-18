@@ -27,6 +27,7 @@
         <!-- Tabs -->
         <a class="nav-link" id="create_accounts_tab" data-toggle="tab" href="#create_accounts">Регистрация аккаунтов</a>
         <a class="nav-link" id="repin_tab" data-toggle="tab" href="#repin">Репины</a>
+        <a class="nav-link" id="parse_pin_tab" data-toggle="tab" href="#parse_pin">Парсинг пинов</a>
       </nav>
     </div>
     <div class="col-md-9">
@@ -155,7 +156,7 @@
             </div>
 
             <!-- save id of repins -->
-            <div class="form-group row align-items-center">
+           <!--  <div class="form-group row align-items-center">
               <div class="form-check">
                 <label class="custom-control custom-checkbox">
                   <input type="checkbox" class="custom-control-input" id="pin_id">
@@ -171,7 +172,7 @@
                   <button onclick="saveFile('pin_file_id')" class="btn btn-secondary btn-sm" type="button">Выбрать файл для идентификаторов</button>
                 </span>
               </div>
-            </div>
+            </div> -->
             <!--  -->
 
             <div class="form-group row align-items-center">
@@ -181,9 +182,76 @@
             </div>
           </form>
         </div>
+ 
+
+        </div>
+
+
+        <!-- Parse pins -->
+        <div class="tab-pane" id="parse_pin" role="tabpanel">
+          <form id="parse_pin_form">
+            <div class="offset-1 col-10">
+            
+            <!-- 
+            <div class="form-group row align-items-center">
+              <textarea class="form-control" id="board_names" name="board_names" rows="3"></textarea>
+            </div>
+            <div class="form-group row align-items-centers">
+              <div class="col-3">
+                <button id="clean_boardnames" onclick="clearTextArea('board_names');return false" class="btn btn-primary btn-sm">Очистить</button>
+              </div>
+              <div class="col-3">
+                <button id="open_boardnames" onclick="openParse('board_names');return false" class="btn btn-primary btn-sm">Выбрать файл с названиями досок</button>
+              </div>
+            </div>
+
+              -->
+            
+
+
+            <div class="form-group row align-items-center">
+
+              <label for="private" class="col-4 col-form-label col-form-label-sm"> Выберите интерес: </label>
+              <select class="form-control form-control-sm col-5" id="private">
+
+                <option value="all">И открытые, и приватные</option>
+                <option value="private">Только приватные</option>
+                <option value="open">Только открытые</option>
+                
+              </select>
+            </div>
+
+
+            <!-- Выбрать файл с пинами -->
+
+            <div class="form-group row align-items-center">
+              <div class="input-group">
+                <input type="text" class="form-control form-control-sm" placeholder="Файл не выбран" name="p" id="p">
+                <span class="input-group-btn">
+                  <button onclick="openFile('p')" class="btn btn-secondary btn-sm" type="button">Выбрать файл с пинами</button>
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group row align-items-center">
+              <label for="reg_count" class="col-form-label form-control-sm offset-1">Задержка между репинами (сек)</label>
+              <div class="col-3">
+                <input class="form-control form-control-sm" type="number" value="0" min="0" name="t" id="t">
+              </div>
+            </div>
+
+             
+            <div class="form-group row align-items-center">
+              <div class="offset-3 col-9">
+                <button type="submit" class="btn btn-outline-primary btn-lg">Сохранить задачу</button>
+              </div>
+            </div>
+          </form>
+        </div>
         <!--  -->
-        
-      </div>
+      
+
+      
     </div>
   </div>
 </div>

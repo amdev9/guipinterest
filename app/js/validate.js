@@ -4,6 +4,31 @@
 
 $(function() {
 
+    $("#parse_pin_form").validate({
+    rules: {
+      // board_names: "required",
+      // pin_file: "required"
+    },
+    messages: {
+      // board_names: "Введите названия досок",
+      // pin_file: "Выберите файл",
+    },
+    highlight: function(element) {
+      $(element).closest('.form-group').addClass('has-danger');
+    },
+    unhighlight: function(element) {
+      $(element).closest('.form-group').removeClass('has-danger');
+    },
+    errorElement: 'span',
+    errorClass: 'form-control-feedback form-control-sm',
+
+    submitHandler: function(form) {
+      completeTask('parse_pin');
+    }
+  });
+
+
+
     $("#repin_form").validate({
     rules: {
       board_names: "required",

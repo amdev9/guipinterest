@@ -244,29 +244,29 @@ function repin(user_id, ses, task, pinId, cb) {
 function apiParseUser(user, task, token) {
 
 
-mkdirFolder(cookieDir)
-  .then(function() {
+  mkdirFolder(cookieDir)
+    .then(function() {
 
-    var iterator = 0;
-    var filterSuccess = 0;
-    var cookiePath = path.join(cookieDir, user._id + '.json');
-    var pin_array = fs.readFileSync(task.pin_file, 'utf8').replace(/ /g, "").split(/\r\n|\r|\n/).filter(isEmpty);
-    Client.Request.setToken(token)
-    var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy))
-      .then(function(session) {
+      var iterator = 0;
+      var filterSuccess = 0;
+      var cookiePath = path.join(cookieDir, user._id + '.json');
+      var pin_array = fs.readFileSync(task.pin_file, 'utf8').replace(/ /g, "").split(/\r\n|\r|\n/).filter(isEmpty);
+      Client.Request.setToken(token)
+      var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy))
+        .then(function(session) {
 
-        Client.Interests.get(session, 955506047789).then(function(res) {
-          console.log(res)
-        }) // id 
-        // Interests.related(session, id)  
-        // Interests.feed(session, id)  
-      })
+          Client.Interests.get(session, 955506047789).then(function(res) {
+            console.log(res)
+          }) // id 
+          // Interests.related(session, id)  
+          // Interests.feed(session, id)  
+        })
 
-  })
-  .catch(function(err) {
-    setStateView(user._id, 'stopped');
-    console.log(err);
-  })
+    })
+    .catch(function(err) {
+      setStateView(user._id, 'stopped');
+      console.log(err);
+    })
 
 
 
@@ -336,6 +336,40 @@ mkdirFolder(cookieDir)
 }
 
 
+
+function apiParsePin(user, task, token) {
+
+  mkdirFolder(logsDir)
+  .then(function() {
+
+
+    setStateView(user._id, 'run');
+    setCompleteView(user._id, '-');
+    
+
+    var iterator = 0;
+    var filterSuccess = 0;
+    var cookiePath = path.join(cookieDir, user._id + '.json');
+    var pin_array = fs.readFileSync(task.pin_file, 'utf8').replace(/ /g, "").split(/\r\n|\r|\n/).filter(isEmpty);
+    Client.Request.setToken(token)
+    var ses = Client.Session.create(cookiePath, user.username, user.password, returnProxyFunc(user.proxy))
+      .then(function(session) {
+        
+        return Client.Interests.feed(session, 955506047789);
+        
+      })
+      .then(function(res) {
+        console.log(res);
+      })
+
+
+  })
+  .catch(function(err) {
+    setStateView(user._id, 'stopped');
+    console.log(err);
+  });
+
+}
 
 function apiRepin(user, task, token) {
 

@@ -1,7 +1,7 @@
 {
   "App": {
     "softname": "PinMaker",
-    "devTools": false,
+    "devTools": true,
     "hostname": "pinmaker.mailglobals.co"
   }
 }

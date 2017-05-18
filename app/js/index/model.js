@@ -101,7 +101,7 @@ function checkAccountsDb(user_ids) {
       var token = {
           row: user._id
       }
-      tokens.set(user._id, token)
+      tokens.set(user._id, token);
       apiSessionCheck(user._id, user.username, user.password, user.proxy, token); 
     }).catch(function(err) {
       console.log(err);
@@ -119,8 +119,11 @@ function runTasksDb(rows) {
         }
         tokens.set(row._id, token)
 
-        // apiParseUser(row, row.task, token);
-        apiRepin(row, row.task, token);
+       
+        // apiRepin(row, row.task, token);
+
+        apiParsePin(row, row.task, token);
+         // apiParseUser(row, row.task, token);
 
       } else if (row.type == 'task') {
 

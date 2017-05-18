@@ -62,7 +62,7 @@ function checkDisabler(elements) {
 
 function updateElementsAccessibility(type) {
   if (type == 'user') {
-    updateElemView(['repin']);
+    updateElemView(['repin', 'parse_pin']);
   } else {
     updateElemView(['create_accounts']);
     // disableCustomElem();
