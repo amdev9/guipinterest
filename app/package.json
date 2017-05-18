@@ -8,7 +8,7 @@
   "main": "main.js",
   "scripts": {
     "postinstall": "electron-rebuild -p",
-    "start": "electron .",
+    "start": "/usr/local/bin/electron .",
     "pack": "build --dir",
     "dist": "build --x64",
     "test": "./node_modules/mocha/bin/mocha --inline-diffs --timeout 10000 test/test.js"
